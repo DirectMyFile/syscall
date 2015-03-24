@@ -69,3 +69,13 @@ Duration getSystemUptime() {
 
   return new Duration(seconds: seconds);
 }
+
+/// Gets the Current User's ID (uid)
+int getUserId() {
+  return invoke("getuid");
+}
+
+/// Sets the Current User's ID (uid)
+void setUserId(int id) {
+  _checkResult(invoke("setuid", [id]));
+}
