@@ -1,0 +1,6 @@
+name: syscall
+description: Make System Calls
+version: 1.0.0
+dependencies:
+  binary_interop: ">=0.0.19 <0.1.0"
+  binary_marshalling: ">=0.0.2 <0.1.0"
