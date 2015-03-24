@@ -38,3 +38,14 @@ String getEnvironmentVariable(String name, [String defaultValue]) {
     return readNativeString(value);
   }
 }
+
+/// Sets the value of [name] in the environment to the specified [value].
+/// If [overwrite] is true, when the variable already exists, it will be overwritten, otherwise it will not be changed.
+void setEnvironmentVariable(String name, String value, {bool overwrite: true}) {
+  _checkResult(invoke("setenv", [toNativeString(name), toNativeString(value), overwrite ? 1 : 0]));
+}
+
+/// Remove the variable specified by [name] from the environment.
+void removeEnvironmentVariable(String name) {
+  _checkResult(invoke("unsetenv", [toNativeString(name)]));
+}

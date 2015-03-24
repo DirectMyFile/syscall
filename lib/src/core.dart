@@ -46,6 +46,10 @@ struct group {
 
 int getloadavg(double loadavg[], int nelem);
 
+char *getenv(const char *name);
+int setenv(const char *name, const char *value, int overwrite);
+int unsetenv(const char *name);
+
 char **environ;
 char *ttyname(int fd);
 
