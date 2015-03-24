@@ -89,3 +89,33 @@ int getGroupId() {
 void setGroupId(int id) {
   _checkResult(invoke("setgid", [id]));
 }
+
+/// Gets the password file entry for [user].
+Map<String, dynamic> getPasswordFileEntry(String user) {
+  var u = toNativeString(user);
+  var result = invoke("getpwnam", [u]);
+
+  if (result.isNullPtr) {
+    throw new ArgumentError.value(user, "user", "Unknown User");
+  }
+
+  var it = result.value;
+
+  var map = {
+    "name": readNativeString(it["pw_name"]),
+    "password": readNativeString(it["pw_passwd"]),
+    "uid": it["pw_uid"],
+    "gid": it["pw_gid"],
+    "full name": it["pw_gecos"].isNullPtr ? null : readNativeString(it["pw_gecos"]),
+    "home": readNativeString(it["pw_dir"]),
+    "shell": readNativeString(it["pw_shell"])
+  };
+
+  if (Platform.isMacOS) {
+    map["class"] = readNativeString(it["pw_class"]);
+    map["password changed"] = it["pw_change"];
+    map["expiration"] = it["pw_expire"];
+  }
+
+  return map;
+}
