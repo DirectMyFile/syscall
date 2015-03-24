@@ -22,10 +22,10 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
   _checkResult(invoke("sysctlbyname", [n, value, len, getType("void*").nullPtr, 0]));
 
   if (dtype != null) {
-    value = LibC.unmarshall(value, dtype);
+    return LibC.unmarshall(value, dtype);
+  } else {
+    return value;
   }
-
-  return value;
 }
 
 @Compatibility("Linux Only")
@@ -118,4 +118,27 @@ Map<String, dynamic> getPasswordFileEntry(String user) {
   }
 
   return map;
+}
+
+/// Get a list of users on the system.
+/// If [showHidden] is true, then users with a _ in front of their name will be shown.
+List<String> getUsers({bool showHidden: false}) {
+  if (Platform.isMacOS) {
+    String out = Process.runSync("dscacheutil", ["q", "user"]).stdout.toString().trim();
+    return out
+      .split("\n")
+      .where((it) => it.startsWith("name: ") && (showHidden ? true : !it.startsWith("name: _")))
+      .map((it) => it.substring(6))
+      .toList();
+  } else {
+    var passwd = new File("/etc/passwd").readAsLinesSync().where((it) => !it.startsWith("#")).toList();
+    var users = [];
+    for (var line in passwd) {
+      if (!showHidden && line.startsWith("_")) {
+        continue;
+      }
+      users.add(line.split(":").first);
+    }
+    return users;
+  }
 }
