@@ -28,6 +28,7 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
   }
 }
 
+/// Get System Information
 @Compatibility("Linux Only")
 LinuxSysInfo getSysInfo() {
   var instance = alloc("sysinfo");
@@ -35,24 +36,50 @@ LinuxSysInfo getSysInfo() {
   return instance;
 }
 
+/// Time Value
 @Compatibility("Mac Only")
 class MacTimeVal {
   int tv_sec;
 }
 
+/// Linux System Information
 @Compatibility("Linux Only")
 class LinuxSysInfo {
+  /// Uptime in Seconds
   int uptime;
-  List<int> loads;
+
+  /// Load Times
+  /// This is a list of 3 doubles.
+  List<double> loads;
+
+  /// Total RAM
   int totalram;
+
+  /// Free RAM
   int freeram;
+
+  /// Shared RAM
   int sharedram;
+
+  /// Buffer RAM
   int bufferram;
+
+  /// Total Swap
   int totalswap;
+
+  /// Free Sawap
   int freeswap;
+
+  /// Number of Processes
   int procs;
+
+  /// Total High Memory
   int totalhigh;
+
+  /// Free High Memory
   int freehigh;
+
+  /// Memory Unit
   int mem_unit;
 }
 
@@ -207,11 +234,19 @@ Group getGroupInfo(int gid) {
   return LibC.unmarshall(invoke("getgrgid", [gid]), Group);
 }
 
+/// Represents a Group
 class Group {
+  /// Group Name
   String gr_name;
+
+  /// Group Password
   String gr_passwd;
+
+  /// Group ID
   int gr_gid;
-  String gr_mem;
+
+  /// Group Members
+  List<String> gr_mem;
 }
 
 /// Gets the current process id.

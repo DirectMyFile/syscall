@@ -1,5 +1,6 @@
 part of syscall;
 
+/// Initial Header
 const String HEADER = """
 typedef unsigned int mode_t;
 typedef unsigned int pid_t;
@@ -76,6 +77,7 @@ struct sysinfo {
   unsigned int mem_unit;
   char _f[20-2*sizeof(long)-sizeof(int)];
 };
+
 struct passwd {
   char   *pw_name;
   char   *pw_passwd;
@@ -113,6 +115,7 @@ struct passwd {
 #endif
 """;
 
+/// C Library
 class LibC {
   static BinaryTypeHelper typeHelper = (() {
     return new BinaryTypeHelper(types);
@@ -175,6 +178,7 @@ class LibC {
   }
 }
 
+/// Documents Compatibility of APIs
 class Compatibility {
   final String message;
 
@@ -193,25 +197,33 @@ BinaryType _getBinaryType(type) {
   return type;
 }
 
+/// Allocate an object specified by [type] using the initial value specified by [value].
 BinaryData alloc(type, [value]) {
   BinaryType bt = _getBinaryType(type);
   return bt.alloc(value);
 }
 
+/// Gets a binary array type for the type
+/// specified by [type] with a size specified by [size].
 BinaryType getArrayType(type, int size) {
   BinaryType bt = _getBinaryType(type);
   return bt.array(size);
 }
 
+/// Allocate an array of objects specified by [type]
+/// with the size specified by [size]
+/// using the initial value specified by [value].
 BinaryData allocArray(type, int size, [value]) {
   var bt = getArrayType(type, size);
   return bt.alloc(value);
 }
 
+/// Gets the binary type for [name].
 BinaryType getType(String name) {
   return LibC.types[name];
 }
 
+/// Turns the object specified by [input] into a native string.
 BinaryData toNativeString(input) {
   String str;
 
@@ -233,6 +245,7 @@ class SystemCallException {
   String toString() => "Failed to make system call. errno = ${code}";
 }
 
+/// Gets the error number
 int getErrorNumber() {
   return getVariable("errno", "int").value;
 }
@@ -243,10 +256,12 @@ void _checkResult(int result) {
   }
 }
 
+/// Gets the variable specified by [name] with the type specified by [type].
 BinaryData getVariable(String name, type) {
   return LibC.getVariable(name, type);
 }
 
+/// Read a string from [input].
 String readNativeString(input) {
   if (input is String) {
     return input;
@@ -259,6 +274,7 @@ String readNativeString(input) {
   return LibC.typeHelper.readString(input);
 }
 
+/// Invoke the system calls specified by [name] with the arguments specified by [args].
 dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> vartypes]) {
   return LibC.invoke(name, args, vartypes);
 }
