@@ -63,8 +63,19 @@ int sysinfo(struct sysinfo *info);
 
 struct sysinfo {
   long uptime;
+  unsigned long loads[3];
+  unsigned long totalram;
+  unsigned long freeram;
+  unsigned long sharedram;
+  unsigned long bufferram;
+  unsigned long totalswap;
+  unsigned long freeswap;
+  unsigned short procs;
+  unsigned long totalhigh;
+  unsigned long freehigh;
+  unsigned int mem_unit;
+  char _f[20-2*sizeof(long)-sizeof(int)];
 };
-
 struct passwd {
   char   *pw_name;
   char   *pw_passwd;
@@ -152,6 +163,15 @@ class LibC {
   static dynamic getVariable(String name, type) {
     type = _getBinaryType(type);
     return type.extern(libc.symbol(name));
+  }
+
+  static void addStruct(String name, Map<String, String> members) {
+    var x = "struct ${name} {\n";
+    for (var k in members.keys) {
+      x += "${members[k]} ${k};\n";
+    }
+    x += "};";
+    libc.declare(x);
   }
 }
 

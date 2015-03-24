@@ -70,14 +70,33 @@ Duration getSystemUptime() {
   return new Duration(seconds: seconds);
 }
 
+/// Get load averages for the system.
+/// [count] specifies how many averages to get.
+/// [count] defaults to 3, and should always be between 0 and 3
+List<double> getLoadAverages([int count = 3]) {
+  var averages = allocArray("double", 3);
+  _checkResult(invoke("getloadavg", [averages, count]));
+  return averages.value.toList();
+}
+
 /// Gets the Current User ID (uid)
 int getUserId() {
   return invoke("getuid");
 }
 
+/// Gets the Effective User ID (euid)
+int getEffectiveUserId() {
+  return invoke("geteuid");
+}
+
 /// Sets the Current User ID (uid)
 void setUserId(int id) {
   _checkResult(invoke("setuid", [id]));
+}
+
+/// Sets the Effective User ID (euid)
+void setEffectiveUserId(int id) {
+  _checkResult(invoke("seteuid", [id]));
 }
 
 /// Gets the Current Group ID (gid)
@@ -88,6 +107,16 @@ int getGroupId() {
 /// Sets the Current Group ID (gid)
 void setGroupId(int id) {
   _checkResult(invoke("setgid", [id]));
+}
+
+/// Gets the Effective Group ID (egid)
+int getEffectiveGroupId() {
+  return invoke("getegid");
+}
+
+/// Sets the Effective Group ID (egid)
+void setEffectiveGroupId(int id) {
+  _checkResult(invoke("setegid", [id]));
 }
 
 /// Gets the password file entry for [user].
@@ -141,4 +170,66 @@ List<String> getUsers({bool showHidden: false}) {
     }
     return users;
   }
+}
+
+/// Gets the group ids for all the groups that the user specified by [name] is in.
+List<int> getUserGroups(String name) {
+  var n = toNativeString(name);
+  var gid = getPasswordFileEntry(name)["gid"];
+  var lastn = 10;
+  var count = alloc("int", lastn);
+  var results = allocArray("gid_t", lastn);
+  var times = 0;
+
+  while (true) {
+    var c = invoke("getgrouplist", [n, gid, results, count]);
+
+    if (c == -1 || lastn != count.value) {
+      if (times >= 8) {
+        throw new Exception("Failed to get groups.");
+      } else {
+        count.value = count.value * 2;
+        results = allocArray("gid_t", count.value);
+        lastn = count.value;
+      }
+    } else {
+      break;
+    }
+
+    times++;
+  }
+
+  return results.value;
+}
+
+/// Gets information for the group specified by [gid].
+Group getGroupInfo(int gid) {
+  return LibC.unmarshall(invoke("getgrgid", [gid]), Group);
+}
+
+class Group {
+  String gr_name;
+  String gr_passwd;
+  int gr_gid;
+  String gr_mem;
+}
+
+/// Gets the current process id.
+int getProcessId() {
+  return invoke("getpid");
+}
+
+/// Gets the parent process id.
+int getParentProcessId() {
+  return invoke("getppid");
+}
+
+/// Gets the Process Group ID for the process specified by [pid].
+/// If [pid] is not specified, then it returns the process group id for the current process.
+int getProcessGroupId([int pid]) {
+  if (pid == null) {
+    pid = getProcessId();
+  }
+
+  return invoke("getpgid", [pid]);
 }

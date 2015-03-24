@@ -20,3 +20,8 @@ void chroot(String path) {
   chdir(path);
   _checkResult(invoke("chroot", [toNativeString(path)]));
 }
+
+/// Commits the buffer cache to disk.
+void sync() {
+  invoke("sync");
+}
