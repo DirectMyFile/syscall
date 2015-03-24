@@ -70,12 +70,22 @@ Duration getSystemUptime() {
   return new Duration(seconds: seconds);
 }
 
-/// Gets the Current User's ID (uid)
+/// Gets the Current User ID (uid)
 int getUserId() {
   return invoke("getuid");
 }
 
-/// Sets the Current User's ID (uid)
+/// Sets the Current User ID (uid)
 void setUserId(int id) {
   _checkResult(invoke("setuid", [id]));
+}
+
+/// Gets the Current Group ID (gid)
+int getGroupId() {
+  return invoke("getgid");
+}
+
+/// Sets the Current Group ID (gid)
+void setGroupId(int id) {
+  _checkResult(invoke("setgid", [id]));
 }
