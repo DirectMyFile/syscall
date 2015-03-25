@@ -415,3 +415,8 @@ ResourceLimit getResourceLimit(int resource) {
 void setResourceLimit(int resource, ResourceLimit limit) {
   _checkResult(invoke("setrlimit", [resource, limit]));
 }
+
+/// Get the System Time in Milliseconds since the Epoch
+int time() {
+  return invoke("time", [getType("time_t").nullPtr]);
+}
