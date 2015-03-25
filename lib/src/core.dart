@@ -271,6 +271,10 @@ String readNativeString(input) {
     throw new ArgumentError.value(input, "input", "should be an instance of BinaryData");
   }
 
+  if (input.isNullPtr) {
+    return null;
+  }
+
   return LibC.typeHelper.readString(input);
 }
 

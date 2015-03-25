@@ -83,6 +83,33 @@ class LinuxSysInfo {
   int mem_unit;
 }
 
+/// Represents a User
+class User {
+  /// Username
+  String name;
+
+  /// Full User Name
+  String fullName;
+
+  /// Home Directory
+  String home;
+
+  /// Shell
+  String shell;
+
+  /// Password
+  String password;
+
+  /// User ID
+  int uid;
+
+  /// Group ID
+  int gid;
+
+  /// Get Group IDs
+  List<int> get groups => getUserGroups(name);
+}
+
 /// Gets the System Uptime
 Duration getSystemUptime() {
   int seconds;
@@ -176,9 +203,29 @@ Map<String, dynamic> getPasswordFileEntry(String user) {
   return map;
 }
 
+/// Get a User
+User getUser(String name) {
+  var info = getPasswordFileEntry(name);
+  var user = new User();
+  user.name = info["name"];
+  user.password = info["password"];
+  user.uid = info["uid"];
+  user.fullName = info["full name"];
+  user.home = info["home"];
+  user.shell = info["shell"];
+  return user;
+}
+
+/// Gets the Current Username
+String getCurrentUsername() =>
+  readNativeString(invoke("getlogin"));
+
+/// Gets the Current User
+User getCurrentUser() => getUser(getCurrentUsername());
+
 /// Get a list of users on the system.
 /// If [showHidden] is true, then users with a _ in front of their name will be shown.
-List<String> getUsers({bool showHidden: false}) {
+List<String> getUsernames({bool showHidden: false}) {
   if (Platform.isMacOS) {
     String out = Process.runSync("dscacheutil", ["q", "user"]).stdout.toString().trim();
     return out
@@ -268,3 +315,7 @@ int getProcessGroupId([int pid]) {
 
   return invoke("getpgid", [pid]);
 }
+
+/// Gets the TTY Name
+String getTtyName([int fd = 0]) =>
+  readNativeString(invoke("ttyname", [fd]));
