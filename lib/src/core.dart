@@ -9,6 +9,7 @@ typedef unsigned int gid_t;
 typedef unsigned int time_t;
 
 int errno;
+char *strerror(int errnum);
 
 pid_t getpid(void);
 pid_t getppid(void);
@@ -255,12 +256,20 @@ class SystemCallException {
   SystemCallException(this.code);
 
   @override
-  String toString() => "Failed to make system call. errno = ${code}";
+  String toString() => "System Call Failed! ${getErrorInfo(code)}";
 }
 
 /// Gets the error number
 int getErrorNumber() {
   return getVariable("errno", "int").value;
+}
+
+String getErrorInfo([int errno]) {
+  if (errno == null) {
+    errno = getErrorNumber();
+  }
+
+  return readNativeString(invoke("strerror", [errno]));
 }
 
 void _checkResult(int result) {
