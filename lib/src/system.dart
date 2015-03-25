@@ -356,3 +356,9 @@ void setHostname(String host) {
 /// Gets the TTY Name
 String getTtyName([int fd = 0]) =>
   readNativeString(invoke("ttyname", [fd]));
+
+/// Fork this Process
+/// Not Recommended, but it seems to work.
+int fork() {
+  return invoke("fork");
+}

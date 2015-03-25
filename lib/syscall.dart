@@ -1,7 +1,6 @@
 library syscall;
 
 import "dart:io";
-import "dart:mirrors";
 
 import "package:binary_interop/binary_interop.dart";
 import "package:binary_marshalling/binary_marshalling.dart";

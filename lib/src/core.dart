@@ -28,6 +28,7 @@ gid_t getgid(void);
 int setgid(gid_t gid);
 gid_t getegid(void);
 int setegid(gid_t gid);
+pid_t fork(void);
 
 time_t time(time_t *t);
 
