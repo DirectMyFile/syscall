@@ -1,8 +1,20 @@
 import "dart:io";
+
 import "package:syscall/syscall.dart";
 
-void main() {
-  chroot(".");
-  print("Current Directory: ${Directory.current.path}");
-  print("Files: ${Directory.current.listSync().map((it) => it.path.split("/").last).join(", ")}");
+void main(List<String> args) {
+  if (args.length == 0) {
+    print("usage: chroot <path> [command]");
+    exit(1);
+  }
+
+  chroot(args[0]);
+
+  var cmd = args.skip(1).join(" ");
+
+  if (cmd.isEmpty) {
+    cmd = "bash";
+  }
+
+  system(cmd);
 }

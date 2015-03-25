@@ -444,3 +444,8 @@ int getSystemTime() {
 void setSystemTime(int time) {
   _checkResult(invoke("stime", [time]));
 }
+
+/// Execute the Given Command
+void system(String command) {
+  _checkResult(invoke("system", [toNativeString(command)]));
+}

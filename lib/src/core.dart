@@ -86,6 +86,7 @@ int chroot(const char *path);
 
 int gethostname(char *name, size_t *len);
 int sethostname(const char *name, size_t *len);
+int system(const char *command);
 
 size_t strlen(const char *str);
 char *strcpy(char *destination, const char *source);
@@ -302,7 +303,7 @@ BinaryData toNativeString(input) {
   String str;
 
   if (input == null) {
-    str = "null";
+    return toNativeString("").type.nullPtr;
   } else {
     str = input.toString();
   }
