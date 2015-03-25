@@ -116,7 +116,7 @@ Duration getSystemUptime() {
 
   if (Platform.isMacOS) {
     var sse = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    seconds = sse - getSysCtlValue("kern.boottime", "struct timeval", MacTimeVal).tv_sec;
+    seconds = sse - getSysCtlValue("kern.boottime", "struct timeval", TimeVal).tv_sec;
   } else {
     seconds = getSysInfo().uptime;
   }
@@ -353,14 +353,14 @@ int fork() {
 WaitResult wait() {
   var status = alloc("int");
   var pid = invoke("wait", [status]);
-  return new WaitResult(pid, status);
+  return new WaitResult(pid, status.value);
 }
 
 /// Wait for a process.
 WaitResult waitpid(int pid, [int options = 0]) {
   var status = alloc("int");
   var rp = invoke("waitpid", [pid, status, options]);
-  return new WaitResult(rp, status);
+  return new WaitResult(rp, status.value);
 }
 
 /// Results for [wait] and [waitpid]
