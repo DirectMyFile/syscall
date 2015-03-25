@@ -57,7 +57,10 @@ char *ttyname(int fd);
 int getgrouplist(const char *user, gid_t group, gid_t *groups, int *ngroups);
 struct passwd *getpwnam(const char *name);
 
-int chmod(const char *path, mode_t mode);
+int chmod(const char *path, mode_t *mode);
+
+int gethostname(char *name, size_t *len);
+int sethostname(const char *name, size_t *len);
 
 #ifdef __LINUX__
 int sysinfo(struct sysinfo *info);
@@ -122,10 +125,22 @@ class LibC {
   })();
 
   static BinaryTypes types = (() {
-    return new BinaryTypes();
+    if (_libc == null) {
+      load();
+    }
+
+    return libc.types;
   })();
 
-  static DynamicLibrary libc = (() {
+  static DynamicLibrary _libc;
+  static DynamicLibrary get libc {
+    if (_libc == null) {
+      load();
+    }
+    return _libc;
+  }
+
+  static void load() {
     String name;
 
     if (Platform.isAndroid || Platform.isLinux) {
@@ -136,7 +151,7 @@ class LibC {
       throw new Exception("Your platform is not supported.");
     }
 
-    var lib = DynamicLibrary.load(name, types: types);
+    _libc = DynamicLibrary.load(name, types: new BinaryTypes());
     var env = {};
 
     if (Platform.isMacOS) {
@@ -147,9 +162,8 @@ class LibC {
       env["__LINUX__"] = "true";
     }
 
-    lib.declare(HEADER, environment: env);
-    return lib;
-  })();
+    libc.declare(HEADER, environment: env);
+  }
 
   static BinaryUnmarshaller unmarshaller = (() {
     return new BinaryUnmarshaller();

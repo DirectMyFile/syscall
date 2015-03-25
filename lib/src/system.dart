@@ -340,6 +340,19 @@ int getSessionId([int pid]) {
   return invoke("getsid", [pid]);
 }
 
+/// Gets the System Hostname
+String getHostname() {
+  var name = alloc("char");
+  var len = alloc("size_t", 255);
+  _checkResult(invoke("gethostname", [name, len]));
+  return readNativeString(name);
+}
+
+/// Sets the System Hostname
+void setHostname(String host) {
+  _checkResult(invoke("sethostname", [toNativeString(host), alloc("size_t", host.length)]));
+}
+
 /// Gets the TTY Name
 String getTtyName([int fd = 0]) =>
   readNativeString(invoke("ttyname", [fd]));
