@@ -32,8 +32,6 @@ pid_t fork(void);
 
 time_t time(time_t *t);
 
-double sqrt(double x);
-
 char *getlogin(void);
 struct group *getgrnam(const char *name);
 struct group *getgrgid(gid_t gid);
