@@ -29,7 +29,10 @@ gid_t getgid(void);
 int setgid(gid_t gid);
 gid_t getegid(void);
 int setegid(gid_t gid);
+
 pid_t fork(void);
+pid_t wait(int *status);
+pid_t waitpid(pid_t pid, int *status, int options);
 
 time_t time(time_t *t);
 

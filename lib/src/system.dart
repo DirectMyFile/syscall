@@ -348,3 +348,24 @@ String getTtyName([int fd = 0]) =>
 int fork() {
   return invoke("fork");
 }
+
+/// Wait for a child process to terminate.
+WaitResult wait() {
+  var status = alloc("int");
+  var pid = invoke("wait", [status]);
+  return new WaitResult(pid, status);
+}
+
+/// Wait for a process.
+WaitResult waitpid(int pid, [int options = 0]) {
+  var status = alloc("int");
+  var rp = invoke("waitpid", [pid, status, options]);
+  return new WaitResult(rp, status);
+}
+
+class WaitResult {
+  final int pid;
+  final int status;
+
+  WaitResult(this.pid, this.status);
+}

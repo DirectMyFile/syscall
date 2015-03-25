@@ -1,7 +1,11 @@
 import "package:syscall/syscall.dart";
 
 void main() {
-  fork();
+  var pid = fork();
 
   print("My PID is ${getProcessId()}");
+
+  if (pid == 0) {
+    wait();
+  }
 }
