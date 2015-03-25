@@ -56,6 +56,35 @@ void sync() {
   invoke("sync");
 }
 
+Stat stat(String path) {
+  var d = alloc("struct stat");
+  _checkResult(invoke("stat", [toNativeString(path), d]));
+  return LibC.unmarshall(d, Stat);
+}
+
+class Stat {
+  @NativeName("st_dev")
+  int deviceId;
+  @NativeName("st_ino")
+  int inode;
+  @NativeName("st_mode")
+  int mode;
+  @NativeName("st_nlink")
+  int hardLinkCount;
+  @NativeName("st_uid")
+  int uid;
+  @NativeName("st_gid")
+  int gid;
+  @NativeName("st_rdev")
+  int specialDeviceFile;
+  @NativeName("st_size")
+  int size;
+  @NativeName("st_blksize")
+  int blockSize;
+  @NativeName("st_blocks")
+  int blocks;
+}
+
 /// Open the file at [path] with the specified [flags].
 /// Returns a file descriptor.
 int open(String path, int flags, [int mode]) {
@@ -94,12 +123,9 @@ int write(int fd, data, [int count]) {
   return _checkResult(invoke("write", [fd, d, count]));
 }
 
+/// Gets the length of the string specified by [input].
 int strlen(String input) {
   return invoke("strlen", [toNativeString(input)]);
-}
-
-void strcpy(x, y) {
-  invoke("strcpy", [x, y]);
 }
 
 class OpenFlags {

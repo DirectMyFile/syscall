@@ -10,6 +10,12 @@ typedef unsigned int suseconds_t;
 typedef unsigned int time_t;
 typedef unsigned int rlim_t;
 typedef unsigned int ssize_t;
+typedef unsigned int dev_t;
+typedef unsigned int ino_t;
+typedef unsigned int nlink_t;
+typedef unsigned int off_t;
+typedef unsigned int blksize_t;
+typedef unsigned int blkcnt_t;
 
 int errno;
 char *strerror(int errnum);
@@ -75,6 +81,21 @@ int sethostname(const char *name, size_t *len);
 
 size_t strlen(const char *str);
 char *strcpy(char *destination, const char *source);
+
+int stat(const char *pathname, struct stat *buf);
+
+struct stat {
+  dev_t     st_dev;
+  ino_t     st_ino;
+  mode_t    st_mode;
+  nlink_t   st_nlink;
+  uid_t     st_uid;
+  gid_t     st_gid;
+  dev_t     st_rdev;
+  off_t     st_size;
+  blksize_t st_blksize;
+  blkcnt_t  st_blocks;
+};
 
 struct rlimit {
   rlim_t rlim_cur;
