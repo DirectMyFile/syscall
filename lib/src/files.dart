@@ -5,22 +5,22 @@ int toOctal(x) {
 }
 
 class FileModes {
-  static final int SET_UID = toOctal(4000);
-  static final int SET_GID = Platform.isMacOS ? 0002000 : 02000;
-  static final int READ_BY_OWNER = Platform.isMacOS ? 0000400 : 00400;
-  static final int WRITE_BY_OWNER = Platform.isMacOS ? 0000200 : 00200;
-  static final int EXECUTE_BY_OWNER = Platform.isMacOS ? 0000100 : 00100;
-  static final int READ_BY_GROUP = Platform.isMacOS ? 0000040 : 00040;
-  static final int WRITE_BY_GROUP = Platform.isMacOS ? 0000020 : 00020;
-  static final int EXECUTE_BY_GROUP = Platform.isMacOS ? 0000010 : 00010;
-  static final int READ_BY_OTHERS = Platform.isMacOS ? 0000004 : 00004;
-  static final int WRITE_BY_OTHERS = Platform.isMacOS ? 0000002 : 00002;
-  static final int EXECUTE_BY_OTHERS = Platform.isMacOS ? 0000001 : 00001;
+  static final int SET_UID = toOctal("4000");
+  static final int SET_GID = toOctal(Platform.isMacOS ? "0002000" : "02000");
+  static final int READ_BY_OWNER = toOctal(Platform.isMacOS ? "0000400" : "00400");
+  static final int WRITE_BY_OWNER = toOctal(Platform.isMacOS ? "0000200" : "00200");
+  static final int EXECUTE_BY_OWNER = toOctal(Platform.isMacOS ? "0000100" : "00100");
+  static final int READ_BY_GROUP = toOctal(Platform.isMacOS ? "0000040" : "00040");
+  static final int WRITE_BY_GROUP = toOctal(Platform.isMacOS ? "0000020" : "00020");
+  static final int EXECUTE_BY_GROUP = toOctal(Platform.isMacOS ? "0000010" : "00010");
+  static final int READ_BY_OTHERS = toOctal(Platform.isMacOS ? "0000004" : "00004");
+  static final int WRITE_BY_OTHERS = toOctal(Platform.isMacOS ? "0000002" : "00002");
+  static final int EXECUTE_BY_OTHERS = toOctal(Platform.isMacOS ? "0000001" : "00001");
 
   static final int FULL_OWNER = toOctal(Platform.isMacOS ? "0000700" : "00700");
-  static final int FULL_GROUP = Platform.isMacOS ? 0000070 : 00070;
-  static final int FULL_OTHERS = Platform.isMacOS ? 0000007 : 00007;
-  static final int ANYONE = FULL_OWNER | FULL_GROUP | FULL_OTHERS;
+  static final int FULL_GROUP = toOctal(Platform.isMacOS ? "0000070" : "00070");
+  static final int FULL_OTHERS = toOctal(Platform.isMacOS ? "0000007" : "00007");
+  static final int FULL_ANYONE = FULL_OWNER | FULL_GROUP | FULL_OTHERS;
   static final int ANYONE_READ = READ_BY_OWNER | READ_BY_GROUP | READ_BY_OTHERS;
   static final int ANYONE_WRITE = WRITE_BY_OWNER | WRITE_BY_GROUP | WRITE_BY_OTHERS;
   static final int ANYONE_EXECUTE = EXECUTE_BY_OWNER | EXECUTE_BY_GROUP | EXECUTE_BY_OTHERS;
@@ -41,6 +41,11 @@ void fchmod(int fd, int mode) {
 /// Change Ownership of a file
 void chown(String path, int uid, int gid) {
   _checkResult(invoke("chown", [toNativeString(path), uid, gid]));
+}
+
+/// Change Ownership of a file
+void fchown(int fd, int uid, int gid) {
+  _checkResult(invoke("fchown", [fd, uid, gid]));
 }
 
 /// Change the current working directory.
@@ -147,19 +152,29 @@ int strlen(String input) {
   return invoke("strlen", [toNativeString(input)]);
 }
 
+/// Get Working Directory
+String getWorkingDirectory() {
+  var d = toNativeString("");
+  var x = invoke("getwd", [d]);
+  if (x.isNullPtr) {
+    throw new SystemCallException(getErrorNumber());
+  }
+  return readNativeString(d);
+}
+
 class OpenFlags {
   static final int APPEND = Platform.isMacOS ? 0x0008 : toOctal("00002000");
   static final int READ = 0x0000;
   static final int WRITE = 0x0001;
   static final int READ_WRITE = 0x0002;
-  static final int NONBLOCK = Platform.isMacOS ? 0x0004 : 00004000;
+  static final int NONBLOCK = Platform.isMacOS ? 0x0004 : toOctal("00004000");
   static final int CREATE = Platform.isMacOS ? 0x0200 : toOctal("00000100");
-  static final int TRUNCATE = Platform.isMacOS ? 0x0400 : 00001000;
-  static final int NOFOLLOW = Platform.isMacOS ? 0x0100 : 00400000;
-  static final int CLOSE_ON_EXEC = Platform.isMacOS ? 0x1000000 : 02000000;
-  static final int NO_CTTY = Platform.isMacOS ? 0x20000 : 00000400;
-  static final int DIRECTORY = Platform.isMacOS ? 0x100000 : 00200000;
-  static final int ERROR_IF_EXISTS = Platform.isMacOS ? 0x0800 : 00000200;
-  static final int SYNC = Platform.isMacOS ? 0x400000 : 00010000;
-  static final int ASYNC = Platform.isMacOS ? 0x0040 : 020000;
+  static final int TRUNCATE = Platform.isMacOS ? 0x0400 : toOctal("00001000");
+  static final int NOFOLLOW = Platform.isMacOS ? 0x0100 : toOctal("00400000");
+  static final int CLOSE_ON_EXEC = Platform.isMacOS ? 0x1000000 : toOctal("02000000");
+  static final int NO_CTTY = Platform.isMacOS ? 0x20000 : toOctal("00000400");
+  static final int DIRECTORY = Platform.isMacOS ? 0x100000 : toOctal("00200000");
+  static final int ERROR_IF_EXISTS = Platform.isMacOS ? 0x0800 : toOctal("00000200");
+  static final int SYNC = Platform.isMacOS ? 0x400000 : toOctal("00010000");
+  static final int ASYNC = Platform.isMacOS ? 0x0040 : toOctal("020000");
 }

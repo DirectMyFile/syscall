@@ -73,9 +73,16 @@ char *ttyname(int fd);
 int getgrouplist(const char *user, gid_t group, gid_t *groups, int *ngroups);
 struct passwd *getpwnam(const char *name);
 
-int chown(const char *pathname, uid_t owner, gid_t group);
 int chmod(const char *path, mode_t mode);
 int fchmod(int fd, mode_t mode);
+int chown(const char *pathname, uid_t owner, gid_t group);
+int fchown(int fd, uid_t owner, gid_t group);
+int lchown(const char *pathname, uid_t owner, gid_t group);
+char *getcwd(char *buf, size_t size);
+char *getwd(char *buf);
+int chdir(const char *path);
+int fchdir(int fd);
+int chroot(const char *path);
 
 int gethostname(char *name, size_t *len);
 int sethostname(const char *name, size_t *len);
@@ -100,6 +107,7 @@ int fsync(int fd);
 
 int stat(const char *pathname, struct stat *buf);
 int fstat(int fd, struct stat *buf);
+int lstat(const char *pathname, struct stat *buf);;
 
 struct rlimit {
   rlim_t rlim_cur;

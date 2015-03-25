@@ -7,5 +7,5 @@ void main() {
   fsync(fd);
   close(fd);
   print("Wrote ${b} bytes.");
-  chmod(path, FileModes.ANYONE);
+  chmod(path, FileModes.FULL_ANYONE);
 }
