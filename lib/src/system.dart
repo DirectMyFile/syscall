@@ -378,3 +378,40 @@ class WaitResult {
 void kill(int pid, int signal) {
   _checkResult(invoke("kill", [pid, signal]));
 }
+
+/// Resource Limit
+class ResourceLimit {
+  static final int CPU = 0;
+  static final int FSIZE = 1;
+  static final int DATA = 2;
+  static final int STACK = 3;
+  static final int CORE = 4;
+  static final int NPROC = Platform.isMacOS ? 7 : 6;
+  static final int NOFILE = Platform.isMacOS ? 8 : 7;
+  static final int MEMLOCK = Platform.isMacOS ? 6 : 8;
+  static final int AS = Platform.isMacOS ? 5 : 9;
+
+  int rlim_cur;
+  int rlim_max;
+
+  ResourceLimit([this.rlim_cur, this.rlim_max]);
+
+  BinaryData asNative() {
+    var l = alloc("struct rlimit");
+    l["rlim_cur"] = rlim_cur;
+    l["rlim_max"] = rlim_max;
+    return l;
+  }
+}
+
+/// Gets the resource limit specified by [resource].
+ResourceLimit getResourceLimit(int resource) {
+  var l = alloc("struct rlimit");
+  _checkResult(invoke("getrlimit", [resource, l]));
+  return LibC.unmarshall(l, ResourceLimit);
+}
+
+/// Sets the resource limit specified by [resource].
+void setResourceLimit(int resource, ResourceLimit limit) {
+  _checkResult(invoke("setrlimit", [resource, limit]));
+}

@@ -7,6 +7,7 @@ typedef unsigned int pid_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;
 typedef unsigned int time_t;
+typedef unsigned int rlim_t;
 
 int errno;
 char *strerror(int errnum);
@@ -87,6 +88,14 @@ struct sysinfo {
   unsigned long freehigh;
   unsigned int mem_unit;
   char _f[20-2*sizeof(long)-sizeof(int)];
+};
+
+int getrlimit(int resource, struct rlimit *rlim);
+int setrlimit(int resource, const struct rlimit *rlim);
+
+struct rlimit {
+  rlim_t rlim_cur;
+  rlim_t rlim_max;
 };
 
 struct passwd {
