@@ -38,8 +38,11 @@ LinuxSysInfo getSysInfo() {
 
 /// Time Value
 class TimeVal {
-  int tv_sec;
-  int tv_usec;
+  @NativeName("tv_sec")
+  int seconds;
+
+  @NativeName("tv_usec")
+  int milliseconds;
 }
 
 /// Linux System Information
@@ -52,35 +55,45 @@ class LinuxSysInfo {
   /// This is a list of 3 doubles.
   List<double> loads;
 
-  /// Total RAM
-  int totalram;
+  /// Total Memory
+  @NativeName("totalram")
+  int totalMemory;
 
-  /// Free RAM
-  int freeram;
+  /// Free Memory
+  @NativeName("freeram")
+  int freeMemory;
 
-  /// Shared RAM
-  int sharedram;
+  /// Shared Memory
+  @NativeName("sharedram")
+  int sharedMemory;
 
   /// Buffer RAM
-  int bufferram;
+  @NativeName("bufferram")
+  int bufferMemory;
 
   /// Total Swap
-  int totalswap;
+  @NativeName("totalswap")
+  int totalSwap;
 
-  /// Free Sawap
-  int freeswap;
+  /// Free Swap
+  @NativeName("freeswap")
+  int freeSwap;
 
   /// Number of Processes
-  int procs;
+  @NativeName("procs")
+  int processCount;
 
   /// Total High Memory
-  int totalhigh;
+  @NativeName("totalhigh")
+  int totalHighMemory;
 
   /// Free High Memory
-  int freehigh;
+  @NativeName("freehigh")
+  int freeHighMemory;
 
   /// Memory Unit
-  int mem_unit;
+  @NativeName("mem_unit")
+  int memoryUnit;
 }
 
 /// Represents a User
@@ -284,16 +297,20 @@ Group getGroupInfo(int gid) {
 /// Represents a Group
 class Group {
   /// Group Name
-  String gr_name;
+  @NativeName("gr_name")
+  String name;
 
   /// Group Password
-  String gr_passwd;
+  @NativeName("gr_passwd")
+  String password;
 
   /// Group ID
-  int gr_gid;
+  @NativeName("gr_gid")
+  int gid;
 
   /// Group Members
-  List<String> gr_mem;
+  @NativeName("gr_mem")
+  List<String> members;
 }
 
 /// Gets the current process id.
@@ -391,15 +408,17 @@ class ResourceLimit {
   static final int MEMLOCK = Platform.isMacOS ? 6 : 8;
   static final int AS = Platform.isMacOS ? 5 : 9;
 
-  int rlim_cur;
-  int rlim_max;
+  @NativeName("rlim_cur")
+  int current;
+  @NativeName("rlim_max")
+  int max;
 
-  ResourceLimit([this.rlim_cur, this.rlim_max]);
+  ResourceLimit([this.current, this.max]);
 
   BinaryData asNative() {
     var l = alloc("struct rlimit");
-    l["rlim_cur"] = rlim_cur;
-    l["rlim_max"] = rlim_max;
+    l["rlim_cur"] = current;
+    l["rlim_max"] = max;
     return l;
   }
 }
