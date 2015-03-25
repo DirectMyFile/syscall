@@ -82,8 +82,6 @@ int sethostname(const char *name, size_t *len);
 size_t strlen(const char *str);
 char *strcpy(char *destination, const char *source);
 
-int stat(const char *pathname, struct stat *buf);
-
 struct stat {
   dev_t     st_dev;
   ino_t     st_ino;
@@ -96,6 +94,8 @@ struct stat {
   blksize_t st_blksize;
   blkcnt_t  st_blocks;
 };
+
+int stat(const char *pathname, struct stat *buf);
 
 struct rlimit {
   rlim_t rlim_cur;

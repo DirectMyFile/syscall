@@ -56,12 +56,15 @@ void sync() {
   invoke("sync");
 }
 
+/// Get File Stats
 Stat stat(String path) {
+  var p = toNativeString(path);
   var d = alloc("struct stat");
-  _checkResult(invoke("stat", [toNativeString(path), d]));
+  _checkResult(invoke("stat", [p, d]));
   return LibC.unmarshall(d, Stat);
 }
 
+/// File Stats
 class Stat {
   @NativeName("st_dev")
   int deviceId;

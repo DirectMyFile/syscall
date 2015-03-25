@@ -6,5 +6,5 @@ void main() {
   var b = write(fd, '#!/usr/bin/env bash\necho "Hello World"');
   close(fd);
   print("Wrote ${b} bytes.");
-  chmod(path, stat(path).mode & toOctal("0777"));
+  chmod(path, stat(path).mode & 1 << toOctal("0777"));
 }
