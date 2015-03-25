@@ -1,8 +1,10 @@
-import "dart:io";
 import "package:syscall/syscall.dart";
 
 void main() {
-  var file = new File("test.sh");
-  file.writeAsStringSync('#!/usr/bin/env bash\necho "Hello World"');
-  chmod(file.path, FileModes.ANYONE);
+  var path = "test.sh";
+  var fd = open(path, OpenFlags.CREATE | OpenFlags.READ_WRITE);
+  var b = write(fd, '#!/usr/bin/env bash\necho "Hello World"');
+  close(fd);
+  print("Wrote ${b} bytes.");
+  chmod(path, toOctal("0777"));
 }

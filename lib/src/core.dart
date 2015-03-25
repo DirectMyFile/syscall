@@ -9,6 +9,7 @@ typedef unsigned int gid_t;
 typedef unsigned int suseconds_t;
 typedef unsigned int time_t;
 typedef unsigned int rlim_t;
+typedef unsigned int ssize_t;
 
 int errno;
 char *strerror(int errnum);
@@ -72,6 +73,9 @@ int chmod(const char *path, mode_t *mode);
 int gethostname(char *name, size_t *len);
 int sethostname(const char *name, size_t *len);
 
+size_t strlen(const char *str);
+char *strcpy(char *destination, const char *source);
+
 struct rlimit {
   rlim_t rlim_cur;
   rlim_t rlim_max;
@@ -84,6 +88,13 @@ struct timeval {
   time_t tv_sec;
   suseconds_t tv_usec;
 };
+
+int open(const char *pathname, int flags);
+int creat(const char *pathname, mode_t mode);
+int close(int fd);
+
+ssize_t write(int fd, const void *buf, size_t count);
+ssize_t read(int fd, void *buf, size_t count);
 
 #ifdef __LINUX__
 int sysinfo(struct sysinfo *info);
@@ -288,10 +299,11 @@ String getErrorInfo([int errno]) {
   return readNativeString(invoke("strerror", [errno]));
 }
 
-void _checkResult(int result) {
+int _checkResult(int result) {
   if (result == -1) {
     throw new SystemCallException(getErrorNumber());
   }
+  return result;
 }
 
 /// Gets the variable specified by [name] with the type specified by [type].
