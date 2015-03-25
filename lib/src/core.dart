@@ -6,6 +6,7 @@ typedef unsigned int mode_t;
 typedef unsigned int pid_t;
 typedef unsigned int uid_t;
 typedef unsigned int gid_t;
+typedef unsigned int suseconds_t;
 typedef unsigned int time_t;
 typedef unsigned int rlim_t;
 
@@ -71,6 +72,19 @@ int chmod(const char *path, mode_t *mode);
 int gethostname(char *name, size_t *len);
 int sethostname(const char *name, size_t *len);
 
+struct rlimit {
+  rlim_t rlim_cur;
+  rlim_t rlim_max;
+};
+
+int getrlimit(int resource, struct rlimit *rlim);
+int setrlimit(int resource, const struct rlimit *rlim);
+
+struct timeval {
+  time_t tv_sec;
+  suseconds_t tv_usec;
+};
+
 #ifdef __LINUX__
 int sysinfo(struct sysinfo *info);
 
@@ -90,14 +104,6 @@ struct sysinfo {
   char _f[20-2*sizeof(long)-sizeof(int)];
 };
 
-int getrlimit(int resource, struct rlimit *rlim);
-int setrlimit(int resource, const struct rlimit *rlim);
-
-struct rlimit {
-  rlim_t rlim_cur;
-  rlim_t rlim_max;
-};
-
 struct passwd {
   char   *pw_name;
   char   *pw_passwd;
@@ -110,14 +116,7 @@ struct passwd {
 #endif
 
 #ifdef __MAC__
-typedef unsigned int suseconds_t;
-
 int sysctlbyname(const char *name, void *oldp, size_t *oldlenp, void *newp, size_t newlen);
-
-struct timeval {
-  time_t tv_sec;
-  suseconds_t tv_usec;
-};
 
 struct passwd {
   char *pw_name;

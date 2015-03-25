@@ -37,9 +37,9 @@ LinuxSysInfo getSysInfo() {
 }
 
 /// Time Value
-@Compatibility("Mac Only")
-class MacTimeVal {
+class TimeVal {
   int tv_sec;
+  int tv_usec;
 }
 
 /// Linux System Information
