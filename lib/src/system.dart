@@ -417,6 +417,11 @@ void setResourceLimit(int resource, ResourceLimit limit) {
 }
 
 /// Get the System Time in Milliseconds since the Epoch
-int time() {
+int getSystemTime() {
   return invoke("time", [getType("time_t").nullPtr]);
+}
+
+/// Sets the System Time using Milliseconds since the Epoch
+void setSystemTime(int time) {
+  _checkResult(invoke("stime", [time]));
 }

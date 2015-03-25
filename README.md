@@ -1,6 +1,6 @@
 # System Calls
 
-Make System Calls in Dart
+Make System Calls in Dart. You can rewrite almost any C program now in Dart!
 
 ## Example
 
@@ -8,10 +8,14 @@ Make System Calls in Dart
 import "package:syscall/syscall.dart";
 
 void main() {
-  print("pid: ${getProcessId()}");
-  print("ppid: ${getParentProcessId()}");
-  print("uid: ${getUserId()}");
-  print("gid: ${getGroupId()}");
-  print("group name: ${getGroupInfo(getGroupId()).gr_name}");
+  print("Prepare to be forked!");
+  var pid = fork();
+  
+  if (pid == 0) {
+    print("I am the original process.");
+    wait();
+  } else {
+    print("I am the child process.");
+  }
 }
 ```
