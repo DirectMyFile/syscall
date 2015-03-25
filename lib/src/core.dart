@@ -33,6 +33,10 @@ int setegid(gid_t gid);
 pid_t fork(void);
 pid_t wait(int *status);
 pid_t waitpid(pid_t pid, int *status, int options);
+int kill(pid_t pid, int sig);
+
+typedef void (*sighandler_t)(int);
+sighandler_t signal(int signum, sighandler_t handler);
 
 time_t time(time_t *t);
 
@@ -60,6 +64,7 @@ char *ttyname(int fd);
 int getgrouplist(const char *user, gid_t group, gid_t *groups, int *ngroups);
 struct passwd *getpwnam(const char *name);
 
+int chown(const char *pathname, uid_t owner, gid_t group);
 int chmod(const char *path, mode_t *mode);
 
 int gethostname(char *name, size_t *len);

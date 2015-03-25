@@ -31,6 +31,10 @@ void chmod(String path, int mode) {
   _checkResult(invoke("chmod", [p, m]));
 }
 
+/// Change Ownership of a file
+void chown(String path, int uid, int gid) {
+  _checkResult(invoke("chown", [toNativeString(path), uid, gid]));
+}
 
 /// Change the current working directory.
 void chdir(String path) {

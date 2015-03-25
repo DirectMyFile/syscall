@@ -363,9 +363,18 @@ WaitResult waitpid(int pid, [int options = 0]) {
   return new WaitResult(rp, status);
 }
 
+/// Results for [wait] and [waitpid]
 class WaitResult {
+  /// PID of Process that Exited
   final int pid;
+
+  /// Exit Status
   final int status;
 
   WaitResult(this.pid, this.status);
+}
+
+/// Kill a Process
+void kill(int pid, int signal) {
+  _checkResult(invoke("kill", [pid, signal]));
 }
