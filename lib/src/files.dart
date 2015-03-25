@@ -30,8 +30,12 @@ class FileModes {
 /// See [this page](http://man7.org/linux/man-pages/man2/chmod.2.html) to get an idea of how to create the [mode].
 void chmod(String path, int mode) {
   var p = toNativeString(path);
-  var m = alloc("mode_t", mode);
-  _checkResult(invoke("chmod", [p, m]));
+  _checkResult(invoke("chmod", [p, mode]));
+}
+
+/// Change the mode of the file specified by the file descriptor to [mode].
+void fchmod(int fd, int mode) {
+  _checkResult(invoke("fchmod", [fd, mode]));
 }
 
 /// Change Ownership of a file
@@ -61,6 +65,13 @@ Stat stat(String path) {
   var p = toNativeString(path);
   var d = alloc("struct stat");
   _checkResult(invoke("stat", [p, d]));
+  return LibC.unmarshall(d, Stat);
+}
+
+/// Get File Stats
+Stat fstat(int fd) {
+  var d = alloc("struct stat");
+  _checkResult(invoke("fstat", [fd, d]));
   return LibC.unmarshall(d, Stat);
 }
 
@@ -100,6 +111,11 @@ int open(String path, int flags, [int mode]) {
 /// Close the specified file descriptor.
 void close(int fd) {
   _checkResult(invoke("close", [fd]));
+}
+
+/// Sync the Kernel Buffer for the file descriptor.
+void fsync(int fd) {
+  _checkResult(invoke("fsync", [fd]));
 }
 
 /// Writes the data by [data] to the file descriptor specified by [fd].

@@ -74,7 +74,8 @@ int getgrouplist(const char *user, gid_t group, gid_t *groups, int *ngroups);
 struct passwd *getpwnam(const char *name);
 
 int chown(const char *pathname, uid_t owner, gid_t group);
-int chmod(const char *path, mode_t *mode);
+int chmod(const char *path, mode_t mode);
+int fchmod(int fd, mode_t mode);
 
 int gethostname(char *name, size_t *len);
 int sethostname(const char *name, size_t *len);
@@ -95,7 +96,10 @@ struct stat {
   blkcnt_t  st_blocks;
 };
 
+int fsync(int fd);
+
 int stat(const char *pathname, struct stat *buf);
+int fstat(int fd, struct stat *buf);
 
 struct rlimit {
   rlim_t rlim_cur;
