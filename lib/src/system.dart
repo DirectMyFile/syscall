@@ -297,14 +297,28 @@ class Group {
 }
 
 /// Gets the current process id.
-int getProcessId() {
-  return invoke("getpid");
+/// If [useCache] is false, then calling this will skip the cache.
+int getProcessId([bool useCache = true]) {
+  if (useCache && _pid != null) {
+    return _pid;
+  }
+
+  return _pid = invoke("getpid");
 }
 
+int _pid;
+
 /// Gets the parent process id.
-int getParentProcessId() {
-  return invoke("getppid");
+/// If [useCache] is false, then calling this will skip the cache.
+int getParentProcessId([bool useCache = true]) {
+  if (useCache && _ppid != null) {
+    return _ppid;
+  }
+
+  return _ppid = invoke("getppid");
 }
+
+int _ppid;
 
 /// Gets the Process Group ID for the process specified by [pid].
 /// If [pid] is not specified, then it returns the process group id for the current process.
@@ -314,6 +328,16 @@ int getProcessGroupId([int pid]) {
   }
 
   return invoke("getpgid", [pid]);
+}
+
+/// Gets the Session ID for the specified [pid].
+/// If [pid] is not specified, it defaults to the current
+int getSessionId([int pid]) {
+  if (pid == null) {
+    pid = getProcessId();
+  }
+
+  return invoke("getsid", [pid]);
 }
 
 /// Gets the TTY Name
