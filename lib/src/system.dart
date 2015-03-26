@@ -366,6 +366,11 @@ int fork() {
   return invoke("fork");
 }
 
+/// Fork this Process while Copying Memory
+int vfork() {
+  return invoke("vfork");
+}
+
 /// Wait for a child process to terminate.
 WaitResult wait() {
   var status = alloc("int");

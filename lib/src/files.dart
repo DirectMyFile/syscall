@@ -154,12 +154,7 @@ int strlen(String input) {
 
 /// Get Working Directory
 String getWorkingDirectory() {
-  var d = toNativeString("");
-  var x = invoke("getwd", [d]);
-  if (x.isNullPtr) {
-    throw new SystemCallException(getErrorNumber());
-  }
-  return readNativeString(d);
+  return readNativeString(invoke("getcwd", [getType("char").nullPtr, 0]));
 }
 
 class OpenFlags {

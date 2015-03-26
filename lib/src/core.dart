@@ -40,9 +40,13 @@ gid_t getegid(void);
 int setegid(gid_t gid);
 
 pid_t fork(void);
+pid_t vfork(void);
 pid_t wait(int *status);
 pid_t waitpid(pid_t pid, int *status, int options);
 int kill(pid_t pid, int sig);
+
+int isatty(int fildes);
+int ttyslot(void);
 
 typedef void (*sighandler_t)(int);
 sighandler_t signal(int signum, sighandler_t handler);
