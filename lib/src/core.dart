@@ -88,8 +88,8 @@ int chdir(const char *path);
 int fchdir(int fd);
 int chroot(const char *path);
 
-int gethostname(char *name, size_t *len);
-int sethostname(const char *name, size_t *len);
+int gethostname(char *name, size_t len);
+int sethostname(const char *name, size_t len);
 int system(const char *command);
 
 size_t strlen(const char *str);
