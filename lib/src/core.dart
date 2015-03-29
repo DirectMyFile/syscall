@@ -110,9 +110,12 @@ struct stat {
 
 int fsync(int fd);
 
+#ifndef __ARM__
 int stat(const char *pathname, struct stat *buf);
+#endif
+
 int fstat(int fd, struct stat *buf);
-int lstat(const char *pathname, struct stat *buf);;
+int lstat(const char *pathname, struct stat *buf);
 
 struct rlimit {
   rlim_t rlim_cur;
@@ -225,6 +228,10 @@ class LibC {
 
     if (Platform.isAndroid || Platform.isLinux) {
       env["__LINUX__"] = "true";
+    }
+
+    if (SysInfo.kernelArchitecture.startsWith("arm")) {
+      env["__ARM__"] = "true";
     }
 
     libc.declare(HEADER, environment: env);
