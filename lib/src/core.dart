@@ -210,10 +210,6 @@ class LibC {
 
     if (Platform.isAndroid || Platform.isLinux) {
       name = "libc.so.6";
-
-      if (new Directory("/lib/arm-linux-gnueabihf").existsSync()) {
-        name = "/lib/arm-linux-gnueabihf/${name}";
-      }
     } else if (Platform.isMacOS) {
       name = "libSystem.dylib";
     } else {
