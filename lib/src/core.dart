@@ -2,6 +2,7 @@ part of syscall;
 
 /// Initial Header
 const String HEADER = """
+typedef unsigned int size_t;
 typedef unsigned int mode_t;
 typedef unsigned int pid_t;
 typedef unsigned int uid_t;
@@ -186,19 +187,17 @@ struct passwd {
 #endif
 """;
 
+void _ensure() {
+  if (LibC._libc == null) {
+    LibC.load();
+  }
+}
+
 /// C Library
 class LibC {
-  static BinaryTypeHelper typeHelper = (() {
-    return new BinaryTypeHelper(types);
-  })();
+  static BinaryTypeHelper typeHelper;
 
-  static BinaryTypes types = (() {
-    if (_libc == null) {
-      load();
-    }
-
-    return libc.types;
-  })();
+  static BinaryTypes get types => libc.types;
 
   static DynamicLibrary _libc;
   static DynamicLibrary get libc {
@@ -220,6 +219,7 @@ class LibC {
     }
 
     _libc = DynamicLibrary.load(name, types: new BinaryTypes());
+    typeHelper = new BinaryTypeHelper(_libc.types);
     var env = {};
 
     if (Platform.isMacOS) {
@@ -234,7 +234,9 @@ class LibC {
       env["__ARM__"] = "true";
     }
 
-    libc.declare(HEADER, environment: env);
+    typeHelper.addHeader("libc.h", HEADER);
+    typeHelper.declare("libc.h", environment: env);
+    libc.link(["libc.h"]);
   }
 
   static BinaryUnmarshaller unmarshaller = (() {
@@ -242,25 +244,19 @@ class LibC {
   })();
 
   static dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> vartypes]) {
+    _ensure();
     return libc.invokeEx(name, args, vartypes);
   }
 
   static dynamic unmarshall(BinaryData data, Type type) {
+    _ensure();
     return unmarshaller.unmarshall(data, type);
   }
 
   static dynamic getVariable(String name, type) {
+    _ensure();
     type = _getBinaryType(type);
     return type.extern(libc.symbol(name));
-  }
-
-  static void addStruct(String name, Map<String, String> members) {
-    var x = "struct ${name} {\n";
-    for (var k in members.keys) {
-      x += "${members[k]} ${k};\n";
-    }
-    x += "};";
-    libc.declare(x);
   }
 }
 
@@ -285,6 +281,7 @@ BinaryType _getBinaryType(type) {
 
 /// Allocate an object specified by [type] using the initial value specified by [value].
 BinaryData alloc(type, [value]) {
+  _ensure();
   BinaryType bt = _getBinaryType(type);
   return bt.alloc(value);
 }
@@ -292,6 +289,7 @@ BinaryData alloc(type, [value]) {
 /// Gets a binary array type for the type
 /// specified by [type] with a size specified by [size].
 BinaryType getArrayType(type, int size) {
+  _ensure();
   BinaryType bt = _getBinaryType(type);
   return bt.array(size);
 }
@@ -300,17 +298,20 @@ BinaryType getArrayType(type, int size) {
 /// with the size specified by [size]
 /// using the initial value specified by [value].
 BinaryData allocArray(type, int size, [value]) {
+  _ensure();
   var bt = getArrayType(type, size);
   return bt.alloc(value);
 }
 
 /// Gets the binary type for [name].
 BinaryType getType(String name) {
+  _ensure();
   return LibC.types[name];
 }
 
 /// Turns the object specified by [input] into a native string.
 BinaryData toNativeString(input) {
+  _ensure();
   String str;
 
   if (input == null) {
@@ -333,6 +334,7 @@ class SystemCallException {
 
 /// Gets the error number
 int getErrorNumber() {
+  _ensure();
   return getVariable("errno", "int").value;
 }
 
@@ -358,6 +360,7 @@ BinaryData getVariable(String name, type) {
 
 /// Read a string from [input].
 String readNativeString(input) {
+  _ensure();
   if (input is String) {
     return input;
   }
@@ -375,5 +378,6 @@ String readNativeString(input) {
 
 /// Invoke the system calls specified by [name] with the arguments specified by [args].
 dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> vartypes]) {
+  _ensure();
   return LibC.invoke(name, args, vartypes);
 }
