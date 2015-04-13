@@ -450,6 +450,6 @@ void setSystemTime(int time) {
 }
 
 /// Execute the Given Command
-void system(String command) {
+void executeSystem(String command) {
   _checkResult(invoke("system", [toNativeString(command)]));
 }
