@@ -21,6 +21,8 @@ typedef unsigned int blkcnt_t;
 int errno;
 char *strerror(int errnum);
 
+int ioctl(int fd, unsigned long request, ...);
+
 pid_t getpid(void);
 pid_t getppid(void);
 pid_t getpgrp(void);

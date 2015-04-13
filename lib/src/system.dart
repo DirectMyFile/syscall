@@ -453,3 +453,19 @@ void setSystemTime(int time) {
 void executeSystem(String command) {
   _checkResult(invoke("system", [toNativeString(command)]));
 }
+
+/// Manipulate Device Specific Parameters
+void ioctl(int fd, int request, msg) {
+  var x = alloc("int", fd);
+  var y = alloc("int", request);
+  if (msg is String) {
+    msg = toNativeString(msg);
+  } else if (msg is int) {
+    msg = alloc("int", msg);
+  } else if (msg is double) {
+    msg = alloc("double", msg);
+  } else if (msg is bool) {
+    msg = alloc("bool", msg);
+  }
+  _checkResult(invoke("ioctl", [x, y, msg]));
+}
