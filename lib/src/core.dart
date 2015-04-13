@@ -111,12 +111,11 @@ struct stat {
 
 int fsync(int fd);
 
-#ifndef __ARM__
+#if !defined(__ARM__) && !defined(__DEBIAN__)
 int stat(const char *pathname, struct stat *buf);
-#endif
-
 int fstat(int fd, struct stat *buf);
 int lstat(const char *pathname, struct stat *buf);
+#endif
 
 struct rlimit {
   rlim_t rlim_cur;
@@ -232,6 +231,12 @@ class LibC {
 
     if (SysInfo.kernelArchitecture.startsWith("arm")) {
       env["__ARM__"] = "true";
+    }
+    
+    var os = SysInfo.operatingSystemName.toLowerCase();
+    
+    if (os.contains("ubuntu") || os.contains("debian")) {
+      env["__DEBIAN__"] = "true";
     }
 
     typeHelper.addHeader("libc.h", HEADER);
