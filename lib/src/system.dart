@@ -382,6 +382,10 @@ void setHostname(String host) {
 String getTtyName([int fd = 0]) =>
   readNativeString(invoke("ttyname", [fd]));
 
+/// Gets the PTS name for the file descriptor [fd].
+String getPtsName(int fd) =>
+  readNativeString(invoke("ptsname", [fd]));
+
 /// Fork this Process
 /// Not Recommended, but it seems to work.
 int fork() {

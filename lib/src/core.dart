@@ -136,6 +136,7 @@ int open(const char *pathname, int flags);
 int creat(const char *pathname, mode_t mode);
 int close(int fd);
 int pipe(int pipefd[2]);
+char *ptsname(int fd);
 
 int chdir(const char *path);
 int fchdir(int fd);
