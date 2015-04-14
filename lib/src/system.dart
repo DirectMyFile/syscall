@@ -477,6 +477,11 @@ void executeSystem(String command) {
   _checkResult(invoke("system", [toNativeString(command)]));
 }
 
+/// Gets the path to the controlling terminal.
+String getControllingTerminal() {
+  return readNativeString(invoke("ctermid", [getType("char").nullPtr]));
+}
+
 /// Manipulate Device Specific Parameters
 void ioctl(int fd, int request, msg) {
   var x = alloc("int", fd);
