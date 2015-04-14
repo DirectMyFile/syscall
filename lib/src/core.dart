@@ -135,9 +135,23 @@ struct timeval {
 int open(const char *pathname, int flags);
 int creat(const char *pathname, mode_t mode);
 int close(int fd);
+int pipe(int pipefd[2]);
+
+int chdir(const char *path);
+int fchdir(int fd);
 
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t read(int fd, void *buf, size_t count);
+
+int uname(struct utsname *buf);
+
+struct utsname {
+  char *sysname;
+  char *nodename;
+  char *release;
+  char *version;
+  char *machine;
+};
 
 #ifdef __LINUX__
 int sysinfo(struct sysinfo *info);

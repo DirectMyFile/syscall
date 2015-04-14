@@ -123,6 +123,29 @@ class User {
   List<int> get groups => getUserGroups(name);
 }
 
+/// uname information
+class KernelInfo {
+  /// Operating System Name
+  @NativeName("sysname")
+  String operatingSystemName;
+  
+  /// Network Name (Probably Hostname)
+  @NativeName("nodename")
+  String networkName;
+  
+  /// Kernel Release
+  @NativeName("release")
+  String release;
+  
+  /// Kernel Version
+  @NativeName("version")
+  String version;
+  
+  /// Machine
+  @NativeName("machine")
+  String machine;
+}
+
 /// Gets the System Uptime
 Duration getSystemUptime() {
   int seconds;
@@ -468,4 +491,11 @@ void ioctl(int fd, int request, msg) {
     msg = alloc("bool", msg);
   }
   _checkResult(invoke("ioctl", [x, y, msg]));
+}
+
+/// Get Kernel Information (uname)
+KernelInfo getKernelInfo() {
+  var l = alloc("struct utsname");
+  _checkResult(invoke("uname", [l]));
+  return LibC.unmarshall(l, KernelInfo);
 }

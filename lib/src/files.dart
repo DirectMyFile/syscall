@@ -123,6 +123,11 @@ void fsync(int fd) {
   _checkResult(invoke("fsync", [fd]));
 }
 
+/// Change the working directory to the directory specified by the file descriptor [fd].
+void fchdir(int fd) {
+  _checkResult(invoke("fchdir", [fd]));
+}
+
 /// Writes the data by [data] to the file descriptor specified by [fd].
 /// [data] can be a List<int> or a String.
 /// If [count] is specified, then only that amount of data will be written.
