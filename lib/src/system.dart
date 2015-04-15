@@ -16,7 +16,6 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
     type = getType(type.toString().substring(0, type.length - 2) + "[${len.value}]");
   }
 
-
   var value = alloc(type);
 
   _checkResult(invoke("sysctlbyname", [n, value, len, getType("void*").nullPtr, 0]));

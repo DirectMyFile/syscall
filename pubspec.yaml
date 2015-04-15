@@ -1,4 +1,6 @@
 name: syscall
+author: Kenneth Endfinger <kaendfinger@gmail.com>
+homepage: https://github.com/DirectMyFile/syscall
 description: Make System Calls
 version: 0.1.0
 dependencies:
