@@ -21,6 +21,8 @@ typedef unsigned int blkcnt_t;
 int errno;
 char *strerror(int errnum);
 
+int ioctl(int fd, unsigned long request, ...);
+
 pid_t getpid(void);
 pid_t getppid(void);
 pid_t getpgrp(void);
@@ -111,12 +113,11 @@ struct stat {
 
 int fsync(int fd);
 
-#ifndef __ARM__
+#if !defined(__ARM__) && !defined(__DEBIAN__)
 int stat(const char *pathname, struct stat *buf);
-#endif
-
 int fstat(int fd, struct stat *buf);
 int lstat(const char *pathname, struct stat *buf);
+#endif
 
 struct rlimit {
   rlim_t rlim_cur;
@@ -134,9 +135,25 @@ struct timeval {
 int open(const char *pathname, int flags);
 int creat(const char *pathname, mode_t mode);
 int close(int fd);
+int pipe(int pipefd[2]);
+char *ptsname(int fd);
+
+int chdir(const char *path);
+int fchdir(int fd);
 
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t read(int fd, void *buf, size_t count);
+
+int uname(struct utsname *buf);
+char *ctermid(char *s);
+
+struct utsname {
+  char *sysname;
+  char *nodename;
+  char *release;
+  char *version;
+  char *machine;
+};
 
 #ifdef __LINUX__
 int sysinfo(struct sysinfo *info);
@@ -232,6 +249,12 @@ class LibC {
 
     if (SysInfo.kernelArchitecture.startsWith("arm")) {
       env["__ARM__"] = "true";
+    }
+    
+    var os = SysInfo.operatingSystemName.toLowerCase();
+    
+    if (os.contains("ubuntu") || os.contains("debian")) {
+      env["__DEBIAN__"] = "true";
     }
 
     typeHelper.addHeader("libc.h", HEADER);

@@ -122,6 +122,29 @@ class User {
   List<int> get groups => getUserGroups(name);
 }
 
+/// uname information
+class KernelInfo {
+  /// Operating System Name
+  @NativeName("sysname")
+  String operatingSystemName;
+  
+  /// Network Name (Probably Hostname)
+  @NativeName("nodename")
+  String networkName;
+  
+  /// Kernel Release
+  @NativeName("release")
+  String release;
+  
+  /// Kernel Version
+  @NativeName("version")
+  String version;
+  
+  /// Machine
+  @NativeName("machine")
+  String machine;
+}
+
 /// Gets the System Uptime
 Duration getSystemUptime() {
   int seconds;
@@ -358,6 +381,10 @@ void setHostname(String host) {
 String getTtyName([int fd = 0]) =>
   readNativeString(invoke("ttyname", [fd]));
 
+/// Gets the PTS name for the file descriptor [fd].
+String getPtsName(int fd) =>
+  readNativeString(invoke("ptsname", [fd]));
+
 /// Fork this Process
 /// Not Recommended, but it seems to work.
 int fork() {
@@ -449,6 +476,34 @@ void setSystemTime(int time) {
 }
 
 /// Execute the Given Command
-void system(String command) {
+void executeSystem(String command) {
   _checkResult(invoke("system", [toNativeString(command)]));
+}
+
+/// Gets the path to the controlling terminal.
+String getControllingTerminal() {
+  return readNativeString(invoke("ctermid", [getType("char").nullPtr]));
+}
+
+/// Manipulate Device Specific Parameters
+void ioctl(int fd, int request, msg) {
+  var x = alloc("int", fd);
+  var y = alloc("int", request);
+  if (msg is String) {
+    msg = toNativeString(msg);
+  } else if (msg is int) {
+    msg = alloc("int", msg);
+  } else if (msg is double) {
+    msg = alloc("double", msg);
+  } else if (msg is bool) {
+    msg = alloc("bool", msg);
+  }
+  _checkResult(invoke("ioctl", [x, y, msg]));
+}
+
+/// Get Kernel Information (uname)
+KernelInfo getKernelInfo() {
+  var l = alloc("struct utsname");
+  _checkResult(invoke("uname", [l]));
+  return LibC.unmarshall(l, KernelInfo);
 }

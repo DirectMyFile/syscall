@@ -6,4 +6,5 @@ void main() {
   print("uid: ${getUserId()}");
   print("gid: ${getGroupId()}");
   print("group name: ${getGroupInfo(getGroupId()).name}");
+  print("ctermid: ${getControllingTerminal()}");
 }
