@@ -4,9 +4,7 @@ part of syscall;
 /// [type] specifies the type of the value.
 /// If [dtype] is specified, the value will be unmarshalled into this type.
 @Compatibility("Mac Only")
-dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
-  type = _getBinaryType(type);
-
+dynamic getSysCtlValue(String name, [type = "char[]", Type dtype = String]) {
   var len = alloc("size_t");
   var n = toNativeString(name);
 
@@ -14,6 +12,8 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
 
   if (type.toString().endsWith("[]")) {
     type = getType(type.toString().substring(0, type.length - 2) + "[${len.value}]");
+  } else {
+    type = _getBinaryType(type);
   }
 
   var value = alloc(type);
@@ -21,6 +21,10 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype]) {
   _checkResult(invoke("sysctlbyname", [n, value, len, getType("void*").nullPtr, 0]));
 
   if (dtype != null) {
+    if (dtype == String) {
+      return readNativeString(value);
+    }
+
     return LibC.unmarshall(value, dtype);
   } else {
     return value;
@@ -127,19 +131,19 @@ class KernelInfo {
   /// Operating System Name
   @NativeName("sysname")
   String operatingSystemName;
-  
+
   /// Network Name (Probably Hostname)
   @NativeName("nodename")
   String networkName;
-  
+
   /// Kernel Release
   @NativeName("release")
   String release;
-  
+
   /// Kernel Version
   @NativeName("version")
   String version;
-  
+
   /// Machine
   @NativeName("machine")
   String machine;
