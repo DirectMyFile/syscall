@@ -149,15 +149,15 @@ int fchdir(int fd);
 ssize_t write(int fd, const void *buf, size_t count);
 ssize_t read(int fd, void *buf, size_t count);
 
-int uname(struct utsname *buf);
+int uname(void *buf);
 char *ctermid(char *s);
 
 struct utsname {
-  char *sysname;
-  char *nodename;
-  char *release;
-  char *version;
-  char *machine;
+  char sysname[256];
+  char nodename[256];
+  char release[256];
+  char version[256];
+  char machine[256];
 };
 
 #ifdef __LINUX__
