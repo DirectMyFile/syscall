@@ -31,6 +31,24 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype = String]) {
   }
 }
 
+/// Open System Log
+void openSystemLog(String ident, int logopt, int facility) {
+  var lident = toNativeString(ident);
+  invoke("openlog", [lident, logopt, facility]);
+}
+
+/// Close System Log
+void closeSystemLog() {
+  invoke("closelog");
+}
+
+
+
+/// Write a message to the system log.
+void writeToSystemLog(int priority, String message) {
+  invoke("syslog", [priority, toNativeString(message)]);
+}
+
 /// Get System Information
 @Compatibility("Linux Only")
 LinuxSysInfo getSysInfo() {

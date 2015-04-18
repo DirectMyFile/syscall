@@ -33,6 +33,11 @@ pid_t setsid(void);
 
 void sync(void);
 
+void syslog(int priority, const char *message, ...);
+void closelog(void);
+void openlog(const char *ident, int logopt, int facility);
+int setlogmask(int maskpri);
+
 uid_t getuid(void);
 uid_t geteuid(void);
 int seteuid(uid_t uid);
@@ -250,9 +255,9 @@ class LibC {
     if (SysInfo.kernelArchitecture.startsWith("arm")) {
       env["__ARM__"] = "true";
     }
-    
+
     var os = SysInfo.operatingSystemName.toLowerCase();
-    
+
     if (os.contains("ubuntu") || os.contains("debian")) {
       env["__DEBIAN__"] = "true";
     }
