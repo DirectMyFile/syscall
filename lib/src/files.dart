@@ -30,34 +30,34 @@ class FileModes {
 /// See [this page](http://man7.org/linux/man-pages/man2/chmod.2.html) to get an idea of how to create the [mode].
 void chmod(String path, int mode) {
   var p = toNativeString(path);
-  _checkResult(invoke("chmod", [p, mode]));
+  checkSysCallResult(invoke("chmod", [p, mode]));
 }
 
 /// Change the mode of the file specified by the file descriptor to [mode].
 void fchmod(int fd, int mode) {
-  _checkResult(invoke("fchmod", [fd, mode]));
+  checkSysCallResult(invoke("fchmod", [fd, mode]));
 }
 
 /// Change Ownership of a file
 void chown(String path, int uid, int gid) {
-  _checkResult(invoke("chown", [toNativeString(path), uid, gid]));
+  checkSysCallResult(invoke("chown", [toNativeString(path), uid, gid]));
 }
 
 /// Change Ownership of a file
 void fchown(int fd, int uid, int gid) {
-  _checkResult(invoke("fchown", [fd, uid, gid]));
+  checkSysCallResult(invoke("fchown", [fd, uid, gid]));
 }
 
 /// Change the current working directory.
 void chdir(String path) {
-  _checkResult(invoke("chdir", [toNativeString(path)]));
+  checkSysCallResult(invoke("chdir", [toNativeString(path)]));
 }
 
 /// Change the root directory of this process.
 /// This will change the working directory as well.
 void chroot(String path) {
   chdir(path);
-  _checkResult(invoke("chroot", [toNativeString(path)]));
+  checkSysCallResult(invoke("chroot", [toNativeString(path)]));
 }
 
 /// Commits the buffer cache to disk.
@@ -69,14 +69,14 @@ void sync() {
 Stat stat(String path) {
   var p = toNativeString(path);
   var d = alloc("struct stat");
-  _checkResult(invoke("stat", [p, d]));
+  checkSysCallResult(invoke("stat", [p, d]));
   return LibC.unmarshall(d, Stat);
 }
 
 /// Get File Stats
 Stat fstat(int fd) {
   var d = alloc("struct stat");
-  _checkResult(invoke("fstat", [fd, d]));
+  checkSysCallResult(invoke("fstat", [fd, d]));
   return LibC.unmarshall(d, Stat);
 }
 
@@ -108,24 +108,24 @@ class Stat {
 /// Returns a file descriptor.
 int open(String path, int flags, [int mode]) {
   var p = toNativeString(path);
-  return _checkResult(
+  return checkSysCallResult(
     invoke("open", mode != null ? [p, flags, mode] : [p, flags], mode != null ? [getType("mode_t")] : [])
   );
 }
 
 /// Close the specified file descriptor.
 void close(int fd) {
-  _checkResult(invoke("close", [fd]));
+  checkSysCallResult(invoke("close", [fd]));
 }
 
 /// Sync the Kernel Buffer for the file descriptor.
 void fsync(int fd) {
-  _checkResult(invoke("fsync", [fd]));
+  checkSysCallResult(invoke("fsync", [fd]));
 }
 
 /// Change the working directory to the directory specified by the file descriptor [fd].
 void fchdir(int fd) {
-  _checkResult(invoke("fchdir", [fd]));
+  checkSysCallResult(invoke("fchdir", [fd]));
 }
 
 /// Checks if the specified file descriptor is a terminal.
@@ -154,7 +154,7 @@ int write(int fd, data, [int count]) {
     count = fc;
   }
 
-  return _checkResult(invoke("write", [fd, d, count]));
+  return checkSysCallResult(invoke("write", [fd, d, count]));
 }
 
 /// Gets the length of the string specified by [input].

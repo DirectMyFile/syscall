@@ -16,5 +16,5 @@ void main(List<String> args) {
     cmd = "bash";
   }
 
-  system(cmd);
+  executeSystem(cmd);
 }

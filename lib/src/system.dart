@@ -1,36 +1,5 @@
 part of syscall;
 
-/// Gets the value of [name] in the sysctl database.
-/// [type] specifies the type of the value.
-/// If [dtype] is specified, the value will be unmarshalled into this type.
-@Compatibility("Mac Only")
-dynamic getSysCtlValue(String name, [type = "char[]", Type dtype = String]) {
-  var len = alloc("size_t");
-  var n = toNativeString(name);
-
-  _checkResult(invoke("sysctlbyname", [n, getType("void*").nullPtr, len, getType("void*").nullPtr, 0]));
-
-  if (type.toString().endsWith("[]")) {
-    type = getType(type.toString().substring(0, type.length - 2) + "[${len.value}]");
-  } else {
-    type = _getBinaryType(type);
-  }
-
-  var value = alloc(type);
-
-  _checkResult(invoke("sysctlbyname", [n, value, len, getType("void*").nullPtr, 0]));
-
-  if (dtype != null) {
-    if (dtype == String) {
-      return readNativeString(value);
-    }
-
-    return LibC.unmarshall(value, dtype);
-  } else {
-    return value;
-  }
-}
-
 /// Open System Log
 void openSystemLog(String ident, int logopt, int facility) {
   var lident = toNativeString(ident);
@@ -41,8 +10,6 @@ void openSystemLog(String ident, int logopt, int facility) {
 void closeSystemLog() {
   invoke("closelog");
 }
-
-
 
 /// Write a message to the system log.
 void writeToSystemLog(int priority, String message) {
@@ -186,7 +153,7 @@ Duration getSystemUptime() {
 /// [count] defaults to 3, and should always be between 0 and 3
 List<double> getLoadAverages([int count = 3]) {
   var averages = allocArray("double", 3);
-  _checkResult(invoke("getloadavg", [averages, count]));
+  checkSysCallResult(invoke("getloadavg", [averages, count]));
   return averages.value.toList();
 }
 
@@ -202,12 +169,12 @@ int getEffectiveUserId() {
 
 /// Sets the Current User ID (uid)
 void setUserId(int id) {
-  _checkResult(invoke("setuid", [id]));
+  checkSysCallResult(invoke("setuid", [id]));
 }
 
 /// Sets the Effective User ID (euid)
 void setEffectiveUserId(int id) {
-  _checkResult(invoke("seteuid", [id]));
+  checkSysCallResult(invoke("seteuid", [id]));
 }
 
 /// Gets the Current Group ID (gid)
@@ -217,7 +184,7 @@ int getGroupId() {
 
 /// Sets the Current Group ID (gid)
 void setGroupId(int id) {
-  _checkResult(invoke("setgid", [id]));
+  checkSysCallResult(invoke("setgid", [id]));
 }
 
 /// Gets the Effective Group ID (egid)
@@ -227,7 +194,7 @@ int getEffectiveGroupId() {
 
 /// Sets the Effective Group ID (egid)
 void setEffectiveGroupId(int id) {
-  _checkResult(invoke("setegid", [id]));
+  checkSysCallResult(invoke("setegid", [id]));
 }
 
 /// Gets the password file entry for [user].
@@ -390,13 +357,13 @@ int getSessionId([int pid]) {
 /// Gets the System Hostname
 String getHostname() {
   var name = alloc("char");
-  _checkResult(invoke("gethostname", [name, 255]));
+  checkSysCallResult(invoke("gethostname", [name, 255]));
   return readNativeString(name);
 }
 
 /// Sets the System Hostname
 void setHostname(String host) {
-  _checkResult(invoke("sethostname", [toNativeString(host), host.length]));
+  checkSysCallResult(invoke("sethostname", [toNativeString(host), host.length]));
 }
 
 /// Gets the TTY Name
@@ -445,7 +412,7 @@ class WaitResult {
 
 /// Kill a Process
 void kill(int pid, int signal) {
-  _checkResult(invoke("kill", [pid, signal]));
+  checkSysCallResult(invoke("kill", [pid, signal]));
 }
 
 /// Resource Limit
@@ -478,13 +445,13 @@ class ResourceLimit {
 /// Gets the resource limit specified by [resource].
 ResourceLimit getResourceLimit(int resource) {
   var l = alloc("struct rlimit");
-  _checkResult(invoke("getrlimit", [resource, l]));
+  checkSysCallResult(invoke("getrlimit", [resource, l]));
   return LibC.unmarshall(l, ResourceLimit);
 }
 
 /// Sets the resource limit specified by [resource].
 void setResourceLimit(int resource, ResourceLimit limit) {
-  _checkResult(invoke("setrlimit", [resource, limit]));
+  checkSysCallResult(invoke("setrlimit", [resource, limit]));
 }
 
 /// Get the System Time in Milliseconds since the Epoch
@@ -494,12 +461,12 @@ int getSystemTime() {
 
 /// Sets the System Time using Milliseconds since the Epoch
 void setSystemTime(int time) {
-  _checkResult(invoke("stime", [time]));
+  checkSysCallResult(invoke("stime", [time]));
 }
 
 /// Execute the Given Command
 void executeSystem(String command) {
-  _checkResult(invoke("system", [toNativeString(command)]));
+  checkSysCallResult(invoke("system", [toNativeString(command)]));
 }
 
 /// Gets the path to the controlling terminal.
@@ -520,12 +487,12 @@ void ioctl(int fd, int request, msg) {
   } else if (msg is bool) {
     msg = alloc("bool", msg);
   }
-  _checkResult(invoke("ioctl", [x, y, msg]));
+  checkSysCallResult(invoke("ioctl", [x, y, msg]));
 }
 
 /// Get Kernel Information (uname)
 KernelInfo getKernelInfo() {
   var l = alloc("struct utsname");
-  _checkResult(invoke("uname", [l]));
+  checkSysCallResult(invoke("uname", [l]));
   return LibC.unmarshall(l, KernelInfo);
 }

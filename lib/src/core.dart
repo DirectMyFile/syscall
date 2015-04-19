@@ -191,8 +191,6 @@ struct passwd {
 #endif
 
 #ifdef __MAC__
-int sysctlbyname(const char *name, void *oldp, size_t *oldlenp, void *newp, size_t newlen);
-
 struct passwd {
   char *pw_name;
   char *pw_passwd;
@@ -283,7 +281,7 @@ class LibC {
 
   static dynamic getVariable(String name, type) {
     _ensure();
-    type = _getBinaryType(type);
+    type = getBinaryType(type);
     return type.extern(libc.symbol(name));
   }
 }
@@ -295,7 +293,7 @@ class Compatibility {
   const Compatibility(this.message);
 }
 
-BinaryType _getBinaryType(type) {
+BinaryType getBinaryType(type) {
   if (type is String) {
     type = LibC.types[type];
   }
@@ -310,7 +308,7 @@ BinaryType _getBinaryType(type) {
 /// Allocate an object specified by [type] using the initial value specified by [value].
 BinaryData alloc(type, [value]) {
   _ensure();
-  BinaryType bt = _getBinaryType(type);
+  BinaryType bt = getBinaryType(type);
   return bt.alloc(value);
 }
 
@@ -318,7 +316,7 @@ BinaryData alloc(type, [value]) {
 /// specified by [type] with a size specified by [size].
 BinaryType getArrayType(type, int size) {
   _ensure();
-  BinaryType bt = _getBinaryType(type);
+  BinaryType bt = getBinaryType(type);
   return bt.array(size);
 }
 
@@ -374,7 +372,7 @@ String getErrorInfo([int errno]) {
   return readNativeString(invoke("strerror", [errno]));
 }
 
-int _checkResult(int result) {
+int checkSysCallResult(int result) {
   if (result == -1) {
     throw new SystemCallException(getErrorNumber());
   }
