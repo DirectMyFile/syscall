@@ -227,7 +227,10 @@ class LibC {
     return _libc;
   }
 
+  static bool loaded = false;
+
   static void load() {
+    loaded = true;
     String name;
 
     if (Platform.isAndroid || Platform.isLinux) {
