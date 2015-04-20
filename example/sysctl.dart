@@ -6,5 +6,5 @@ main() {
   print("Kernel Version: ${version}");
   var mib = [1, 8];
   var maxArgs = getSysCtlValueFromMib(mib, type: "int");
-  print("Max Arguments: ${maxArgs}");
+  print("Maximum Arguments: ${maxArgs}");
 }
