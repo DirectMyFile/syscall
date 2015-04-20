@@ -96,6 +96,3 @@ dynamic getSysCtlValueFromMib(List<int> mib, {type: "char[]", Type dtype, bool r
     return value;
   }
 }
-
-String getArgumentsForProcessId(int id) {
-}
