@@ -5,6 +5,8 @@ Make System Calls in Dart. You can rewrite almost any C program now in Dart!
 Currently this library supports Linux and Mac OSX.
 In the future, there will be partial support for Windows.
 
+Note that the name is slightly misleading. System Calls include both pure C functions and actual System Calls.
+
 ## Examples
 
 This is just a few examples of what is possible.
