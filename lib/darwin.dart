@@ -3,6 +3,7 @@
 library syscall.darwin;
 
 import "package:syscall/syscall.dart";
+import "package:binary_interop/binary_interop.dart";
 
 const String _HEADER = """
 typedef unsigned int u_int;
@@ -24,11 +25,35 @@ void _init() {
     _initialized = true;
   }
 }
+/// Sets the value of [name] in the sysctl database.
+/// [type] specifies the type of the value.
+/// If [dtype] is specified, the value will be unmarshalled into this type.
+///
+/// Returns the old value.
+dynamic setSysCtlValue(String name, value, {type: "char[]", Type dtype}) {
+  BinaryData val;
+  if (value is BinaryData) {
+    val = value;
+  } else if (value is String) {
+    val = toNativeString(value);
+  } else if (value is int) {
+    val = alloc("int", value);
+  } else if (value is double) {
+    val = alloc("double", value);
+  }
+  var old = getSysCtlValue(name, type: type, dtype: dtype);
+  checkSysCallResult(invoke("sysctlbyname", [toNativeString(name), getType("void*").nullPtr, alloc("size_t", 0), val, val.type.size]));
+  return old;
+}
 
 /// Gets the value of [name] in the sysctl database.
 /// [type] specifies the type of the value.
 /// If [dtype] is specified, the value will be unmarshalled into this type.
-dynamic getSysCtlValue(String name, [type = "char[]", Type dtype = String]) {
+dynamic getSysCtlValue(String name, {type: "char[]", Type dtype, bool raw: true}) {
+  if (type == "char[]" && dtype == null) {
+    dtype = String;
+  }
+
   _init();
   var len = alloc("size_t");
   var n = toNativeString(name);
@@ -52,6 +77,10 @@ dynamic getSysCtlValue(String name, [type = "char[]", Type dtype = String]) {
 
     return LibC.unmarshall(value, dtype);
   } else {
+    if (type.toString() == "int") {
+      return value.value;
+    }
+
     return value;
   }
 }
