@@ -25,6 +25,7 @@ void _init() {
     _initialized = true;
   }
 }
+
 /// Sets the value of [name] in the sysctl database.
 /// [type] specifies the type of the value.
 /// If [dtype] is specified, the value will be unmarshalled into this type.
