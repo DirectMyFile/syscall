@@ -262,19 +262,44 @@ class LibC {
     if (os.contains("ubuntu") || os.contains("debian")) {
       env["__DEBIAN__"] = "true";
     }
+    
+    _env = env;
 
     typeHelper.addHeader("libc.h", HEADER);
     typeHelper.declare("libc.h", environment: env);
     libc.link(["libc.h"]);
   }
+  
+  static void loadHeader(String name, String content) {
+    typeHelper.addHeader(name, content);
+    typeHelper.declare(name, environment: _env);
+  } 
+  
+  static Map<String, dynamic> _env;
 
   static BinaryUnmarshaller unmarshaller = (() {
     return new BinaryUnmarshaller();
   })();
+  
+  static Map<String, DynamicLibrary> _libs = {};
+  
+  static void register(String name, DynamicLibrary lib) {
+    _libs[name] = lib;
+  }
 
   static dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> vartypes]) {
     _ensure();
-    return libc.invokeEx(name, args, vartypes);
+    var lib = libc;
+    if (name.contains("::")) {
+      var libname = name.substring(0, name.indexOf("::"));
+      name = name.substring(libname.length + 2);
+      if (_libs.containsKey(libname)) {
+        lib = _libs[libname];
+      } else {
+        throw new SystemCallException("Library not found: ${libname}");
+      }
+    }
+    return lib.invokeEx(name, args, vartypes);
   }
 
   static dynamic unmarshall(BinaryData data, Type type) {
@@ -410,3 +435,6 @@ dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> var
   _ensure();
   return LibC.invoke(name, args, vartypes);
 }
+
+/// Allocate an empty string.
+BinaryData allocEmptyString() => toNativeString("");

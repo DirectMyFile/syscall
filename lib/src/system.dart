@@ -356,9 +356,11 @@ int getSessionId([int pid]) {
 
 /// Gets the System Hostname
 String getHostname() {
-  var name = alloc("char");
-  checkSysCallResult(invoke("gethostname", [name, 255]));
-  return readNativeString(name);
+  // TODO(kaendfinger): Currently we use a workaround with uname, since gethostname acts weird.
+  return getKernelInfo().networkName;
+  // var name = allocEmptyString();
+  // checkSysCallResult(invoke("gethostname", [name, 255]));
+  // return readNativeString(name);
 }
 
 /// Sets the System Hostname
