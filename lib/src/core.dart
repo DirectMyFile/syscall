@@ -73,6 +73,8 @@ struct group {
   char  **gr_mem;
 };
 
+void* malloc(size_t size);
+
 int getloadavg(double loadavg[], int nelem);
 
 char *getenv(const char *name);
@@ -272,6 +274,7 @@ class LibraryManager {
   }
 
   static void loadHeader(String name, String content) {
+    _ensure();
     typeHelper.addHeader(name, content);
     typeHelper.declare(name, environment: _env);
   }
@@ -285,6 +288,7 @@ class LibraryManager {
   static Map<String, DynamicLibrary> _libs = {};
 
   static void register(String name, DynamicLibrary lib) {
+    _ensure();
     _libs[name] = lib;
   }
 
