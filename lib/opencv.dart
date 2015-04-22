@@ -21,14 +21,14 @@ class LibOpenCV {
   static DynamicLibrary libhigh;
 
   static void init() {
-    libcore = DynamicLibrary.load(getLibName("core"), types: LibC.types);
-    LibC.loadHeader("libopencv_core.h", _HEADER_CORE);
+    libcore = DynamicLibrary.load(getLibName("core"), types: LibraryManager.types);
+    LibraryManager.loadHeader("libopencv_core.h", _HEADER_CORE);
     libcore.link(["libopencv_core.h"]);
-    LibC.register("opencv_core", libcore);
-    libhigh = DynamicLibrary.load(getLibName("highgui"), types: LibC.types);
-    LibC.loadHeader("libopencv_highgui.h", _HEADER_HIGH);
+    LibraryManager.register("opencv_core", libcore);
+    libhigh = DynamicLibrary.load(getLibName("highgui"), types: LibraryManager.types);
+    LibraryManager.loadHeader("libopencv_highgui.h", _HEADER_HIGH);
     libhigh.link(["libopencv_highgui.h"]);
-    LibC.register("opencv_highgui", libhigh);
+    LibraryManager.register("opencv_highgui", libhigh);
   }
 
   static String getLibName(String n) {

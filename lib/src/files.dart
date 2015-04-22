@@ -70,14 +70,14 @@ Stat stat(String path) {
   var p = toNativeString(path);
   var d = alloc("struct stat");
   checkSysCallResult(invoke("stat", [p, d]));
-  return LibC.unmarshall(d, Stat);
+  return LibraryManager.unmarshall(d, Stat);
 }
 
 /// Get File Stats
 Stat fstat(int fd) {
   var d = alloc("struct stat");
   checkSysCallResult(invoke("fstat", [fd, d]));
-  return LibC.unmarshall(d, Stat);
+  return LibraryManager.unmarshall(d, Stat);
 }
 
 /// File Stats

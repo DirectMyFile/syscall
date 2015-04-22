@@ -4,7 +4,7 @@ import "dart:io";
 
 import "package:binary_interop/binary_interop.dart";
 import "package:binary_marshalling/binary_marshalling.dart";
-import 'package:binary_marshalling/annotations.dart';
+import "package:binary_marshalling/annotations.dart";
 
 import "package:system_info/system_info.dart";
 

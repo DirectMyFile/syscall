@@ -302,7 +302,7 @@ List<int> getUserGroups(String name) {
 
 /// Gets information for the group specified by [gid].
 Group getGroupInfo(int gid) {
-  return LibC.unmarshall(invoke("getgrgid", [gid]), Group);
+  return LibraryManager.unmarshall(invoke("getgrgid", [gid]), Group);
 }
 
 /// Represents a Group
@@ -448,7 +448,7 @@ class ResourceLimit {
 ResourceLimit getResourceLimit(int resource) {
   var l = alloc("struct rlimit");
   checkSysCallResult(invoke("getrlimit", [resource, l]));
-  return LibC.unmarshall(l, ResourceLimit);
+  return LibraryManager.unmarshall(l, ResourceLimit);
 }
 
 /// Sets the resource limit specified by [resource].
@@ -496,5 +496,5 @@ void ioctl(int fd, int request, msg) {
 KernelInfo getKernelInfo() {
   var l = alloc("struct utsname");
   checkSysCallResult(invoke("uname", [l]));
-  return LibC.unmarshall(l, KernelInfo);
+  return LibraryManager.unmarshall(l, KernelInfo);
 }

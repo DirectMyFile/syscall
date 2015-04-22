@@ -16,12 +16,12 @@ bool _initialized = false;
 
 void _init() {
   if (!_initialized) {
-    if (!LibC.loaded) {
-      LibC.init();
+    if (!LibraryManager.loaded) {
+      LibraryManager.init();
     }
-    LibC.typeHelper.addHeader("libc_darwin.h", _HEADER);
-    LibC.typeHelper.declare("libc_darwin.h");
-    LibC.libc.link(["libc_darwin.h"]);
+    LibraryManager.typeHelper.addHeader("libc_darwin.h", _HEADER);
+    LibraryManager.typeHelper.declare("libc_darwin.h");
+    LibraryManager.libc.link(["libc_darwin.h"]);
     _initialized = true;
   }
 }
@@ -76,7 +76,7 @@ dynamic getSysCtlValue(String name, {type: "char[]", Type dtype, bool raw: true}
       return readNativeString(value);
     }
 
-    return LibC.unmarshall(value, dtype);
+    return LibraryManager.unmarshall(value, dtype);
   } else {
     if (type.toString() == "int") {
       return value.value;
@@ -117,7 +117,7 @@ dynamic getSysCtlValueFromMib(List<int> mib, {type: "char[]", Type dtype, bool r
       return readNativeString(value);
     }
 
-    return LibC.unmarshall(value, dtype);
+    return LibraryManager.unmarshall(value, dtype);
   } else {
     if (type.toString() == "int") {
       return value.value;

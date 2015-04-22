@@ -208,13 +208,14 @@ struct passwd {
 """;
 
 void _ensure() {
-  if (LibC._libc == null) {
-    LibC.init();
+  if (LibraryManager._libc == null) {
+    LibraryManager.init();
   }
 }
 
-/// C Library
-class LibC {
+/// Library Manager
+/// This also loads the C Library
+class LibraryManager {
   static BinaryTypeHelper typeHelper;
 
   static BinaryTypes get types => libc.types;
@@ -296,7 +297,7 @@ class LibC {
       if (_libs.containsKey(libname)) {
         lib = _libs[libname];
       } else {
-        throw new SystemCallException("Library not found: ${libname}");
+        throw new LibraryException("Library not found: ${libname}");
       }
     }
     return lib.invokeEx(name, args, vartypes);
@@ -323,7 +324,7 @@ class Compatibility {
 
 BinaryType getBinaryType(type) {
   if (type is String) {
-    type = LibC.types[type];
+    type = LibraryManager.types[type];
   }
 
   if (type is! BinaryType) {
@@ -360,7 +361,7 @@ BinaryData allocArray(type, int size, [value]) {
 /// Gets the binary type for [name].
 BinaryType getType(String name) {
   _ensure();
-  return LibC.types[name];
+  return LibraryManager.types[name];
 }
 
 /// Turns the object specified by [input] into a native string.
@@ -374,7 +375,7 @@ BinaryData toNativeString(input) {
     str = input.toString();
   }
 
-  return LibC.typeHelper.allocString(str);
+  return LibraryManager.typeHelper.allocString(str);
 }
 
 class SystemCallException {
@@ -384,6 +385,15 @@ class SystemCallException {
 
   @override
   String toString() => "System Call Failed! ${getErrorInfo(code)}";
+}
+
+class LibraryException {
+  final String message;
+
+  LibraryException(this.message);
+
+  @override
+  String toString() => message;
 }
 
 /// Gets the error number
@@ -409,7 +419,7 @@ int checkSysCallResult(int result) {
 
 /// Gets the variable specified by [name] with the type specified by [type].
 BinaryData getVariable(String name, type) {
-  return LibC.getVariable(name, type);
+  return LibraryManager.getVariable(name, type);
 }
 
 /// Read a string from [input].
@@ -427,13 +437,13 @@ String readNativeString(input) {
     return null;
   }
 
-  return LibC.typeHelper.readString(input);
+  return LibraryManager.typeHelper.readString(input);
 }
 
 /// Invoke the system calls specified by [name] with the arguments specified by [args].
 dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> vartypes]) {
   _ensure();
-  return LibC.invoke(name, args, vartypes);
+  return LibraryManager.invoke(name, args, vartypes);
 }
 
 /// Allocate an empty string.
