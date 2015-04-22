@@ -1,7 +1,7 @@
 name: syscall
 author: Kenneth Endfinger <kaendfinger@gmail.com>
 homepage: https://github.com/DirectMyFile/syscall
-description: Make System Calls
+description: Make calls to native code
 version: 0.3.0
 dependencies:
   binary_interop: ">=0.0.19 <0.1.0"
