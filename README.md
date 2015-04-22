@@ -8,6 +8,10 @@ In the future, there will be partial support for Windows.
 Note that the name is misleading.
 System Calls include both pure C functions and actual System Calls, as well as bindings to commonly-used libraries.
 
+## Bindings
+
+- OpenCV (WIP)
+
 ## Examples
 
 This is just a few examples of what is possible.
