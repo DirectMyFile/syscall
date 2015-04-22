@@ -209,7 +209,7 @@ struct passwd {
 
 void _ensure() {
   if (LibC._libc == null) {
-    LibC.load();
+    LibC.init();
   }
 }
 
@@ -222,14 +222,14 @@ class LibC {
   static DynamicLibrary _libc;
   static DynamicLibrary get libc {
     if (_libc == null) {
-      load();
+      init();
     }
     return _libc;
   }
 
   static bool loaded = false;
 
-  static void load() {
+  static void init() {
     loaded = true;
     String name;
 
@@ -262,27 +262,27 @@ class LibC {
     if (os.contains("ubuntu") || os.contains("debian")) {
       env["__DEBIAN__"] = "true";
     }
-    
+
     _env = env;
 
     typeHelper.addHeader("libc.h", HEADER);
     typeHelper.declare("libc.h", environment: env);
     libc.link(["libc.h"]);
   }
-  
+
   static void loadHeader(String name, String content) {
     typeHelper.addHeader(name, content);
     typeHelper.declare(name, environment: _env);
-  } 
-  
+  }
+
   static Map<String, dynamic> _env;
 
   static BinaryUnmarshaller unmarshaller = (() {
     return new BinaryUnmarshaller();
   })();
-  
+
   static Map<String, DynamicLibrary> _libs = {};
-  
+
   static void register(String name, DynamicLibrary lib) {
     _libs[name] = lib;
   }

@@ -17,7 +17,7 @@ bool _initialized = false;
 void _init() {
   if (!_initialized) {
     if (!LibC.loaded) {
-      LibC.load();
+      LibC.init();
     }
     LibC.typeHelper.addHeader("libc_darwin.h", _HEADER);
     LibC.typeHelper.declare("libc_darwin.h");
