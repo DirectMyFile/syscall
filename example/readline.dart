@@ -1,8 +1,6 @@
 import "package:syscall/readline.dart";
 
 void main() {
-  LibReadline.init();
-
-  var name = readLine("What is your name? ");
+  var name = Readline.readLine("What is your name? ");
   print(name);
 }

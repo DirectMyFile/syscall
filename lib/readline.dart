@@ -38,12 +38,18 @@ class LibReadline {
   }
 }
 
-String readLine(String prompt) {
-  var p = toNativeString(prompt);
-  return readNativeString(invoke("readline::readline", [p]));
-}
+class Readline {
+  static String readLine(String prompt) {
+    LibReadline.init();
 
-void addLineToHistory(String input) {
-  var r = toNativeString(input);
-  checkSysCallResult(r)
+    var p = toNativeString(prompt);
+    return readNativeString(invoke("readline::readline", [p]));
+  }
+
+  static void addLineToHistory(String input) {
+    LibReadline.init();
+
+    var r = toNativeString(input);
+    checkSysCallResult(invoke("add_history", [r]));
+  }
 }
