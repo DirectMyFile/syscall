@@ -39,17 +39,27 @@ class LibReadline {
 }
 
 class Readline {
-  static String readLine(String prompt) {
+  static String readLine(String prompt, {bool addToHistory: false}) {
     LibReadline.init();
 
     var p = toNativeString(prompt);
-    return readNativeString(invoke("readline::readline", [p]));
+    var result = readNativeString(invoke("readline::readline", [p]));
+    if (addToHistory) {
+      addLineToHistory(result);
+    }
+    return result;
+  }
+
+  static void clearHistory() {
+    LibReadline.init();
+
+    invoke("readline::clear_history");
   }
 
   static void addLineToHistory(String input) {
     LibReadline.init();
 
     var r = toNativeString(input);
-    checkSysCallResult(invoke("add_history", [r]));
+    checkSysCallResult(invoke("readline::add_history", [r]));
   }
 }

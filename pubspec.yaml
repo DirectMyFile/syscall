@@ -7,7 +7,11 @@ dependencies:
   binary_interop: ">=0.0.19 <0.1.0"
   binary_marshalling: ">=0.0.2 <0.1.0"
   unsafe_extension: ">=0.0.12 <0.0.15"
-  binary_types: ">=0.0.50 <0.0.51"
+dependency_overrides:
+  binary_types:
+    git:
+      url: https://github.com/kaendfinger/binary_types.git
+      ref: work
 transformers:
 - $dart2js:
     $exclude: "**"

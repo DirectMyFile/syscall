@@ -56,8 +56,9 @@ enum SnappyStatus {
 }
 
 class Snappy {
-  static Utf8Decoder _decoder = new Utf8Decoder(allowMalformed: true);
   static String compress(String input) {
+    LibSnappy.init();
+
     var inputString = toNativeString(input);
     var maxOutputSize = alloc("size_t", getMaxCompressedLength(inputString.type.size));
     var rs = allocArray("char", maxOutputSize.value);
@@ -65,11 +66,14 @@ class Snappy {
     if (status != SnappyStatus.OK) {
       throw new SnappyException(status);
     }
-    List<int> bytes = rs.value.take(maxOutputSize.value).toList();
-    return _decoder.convert(bytes);
+    rs = allocArray("char", maxOutputSize.value, rs.value.take(maxOutputSize.value).toList());
+    print(rs.value);
+    return readNativeString(rs);
   }
 
   static String decompress(String input) {
+    LibSnappy.init();
+
     var inputString = toNativeString(input);
     var uncompressedSize = alloc("size_t", getUncompressedLength(inputString));
     var rs = allocArray("char", uncompressedSize.value);
@@ -77,8 +81,8 @@ class Snappy {
     if (status != SnappyStatus.OK) {
       throw new SnappyException(status);
     }
-    List<int> bytes = rs.value.take(uncompressedSize.type.size).toList();
-    return _decoder.convert(bytes.take(uncompressedSize.value).toList(), 0, uncompressedSize.value);
+    print(rs.value);
+    return readNativeString(rs);
   }
 
   static SnappyStatus getStatus(int id) {
@@ -93,6 +97,8 @@ class Snappy {
   }
 
   static int getUncompressedLength(BinaryData input) {
+    LibSnappy.init();
+
     var result = alloc("size_t");
     var status = getStatus(invoke("snappy::snappy_uncompressed_length", [input, input.type.size, result]));
     if (status != SnappyStatus.OK) {
@@ -102,6 +108,8 @@ class Snappy {
   }
 
   static int getMaxCompressedLength(int size) {
+    LibSnappy.init();
+
     return invoke("snappy::snappy_max_compressed_length", [size]);
   }
 }
