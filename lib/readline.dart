@@ -11,6 +11,11 @@ int rl_initialize(void);
 void using_history(void);
 int add_history(const char* input);
 void clear_history(void);
+void rl_redisplay(void);
+int rl_set_prompt(const char *prompt);
+int rl_insert_text(const char *text);
+int rl_kill_text(int start, int end);
+int rl_read_key(void);
 """;
 
 class LibReadline {

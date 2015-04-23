@@ -58,6 +58,10 @@ handleLine(String line) async {
   var cmd = split[0];
   var args = split.skip(1).toList();
 
+  await handleCommand(cmd, args);
+}
+
+handleCommand(String cmd, List<String> args) async {
   if (cmd == "exit") {
     exit(0);
   } else if (cmd == "clear-history") {
