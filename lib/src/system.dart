@@ -140,7 +140,7 @@ Duration getSystemUptime() {
 
   if (Platform.isMacOS) {
     var sse = new DateTime.now().millisecondsSinceEpoch ~/ 1000;
-    seconds = sse - getSysCtlValue("kern.boottime", "struct timeval", TimeVal).tv_sec;
+    seconds = sse - getSysCtlValue("kern.boottime", type: "struct timeval", dtype: TimeVal).tv_sec;
   } else {
     seconds = getSysInfo().uptime;
   }

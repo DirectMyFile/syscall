@@ -1,6 +1,5 @@
 library syscall.snappy;
 
-import "dart:convert";
 import "dart:io";
 
 import "package:binary_interop/binary_interop.dart";

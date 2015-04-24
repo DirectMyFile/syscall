@@ -1,4 +1,3 @@
-import "package:syscall/syscall.dart";
 import "package:syscall/darwin.dart";
 
 main() {
