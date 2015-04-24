@@ -6,7 +6,7 @@ import "package:binary_interop/binary_interop.dart";
 import "package:syscall/syscall.dart";
 
 const String _HEADER = """
-typedef int rl_command_func_t(int, int);
+typedef int rl_command_func_t(int l, int z);
 
 char *readline(const char* prompt);
 int rl_initialize(void);
@@ -15,9 +15,13 @@ int add_history(const char* input);
 void clear_history(void);
 void rl_redisplay(void);
 int rl_set_prompt(const char *prompt);
+int rl_on_new_line(void);
 int rl_insert_text(const char *text);
 int rl_kill_text(int start, int end);
 int rl_read_key(void);
+int rl_bind_key(int key, rl_command_func_t *function);
+int rl_unbind_key(int key);
+int rl_catch_signals;
 """;
 
 class LibReadline {
@@ -29,18 +33,28 @@ class LibReadline {
     }
 
     String name;
+    bool isGnu = true;
 
     if (Platform.isLinux || Platform.isAndroid) {
       name = "libreadline.so";
     } else if (Platform.isMacOS) {
-      name = "libreadline.dylib";
+      if (new File("/usr/local/lib/libreadline.dylib").existsSync()) {
+        name = "/usr/local/lib/libreadline.dylib";
+      } else {
+        name = "libreadline.dylib";
+        isGnu = false;
+      }
     } else {
       throw new Exception("Your platform is not supported.");
     }
 
     libreadline = DynamicLibrary.load(name, types: LibraryManager.types);
     LibraryManager.register("readline", libreadline);
-    LibraryManager.loadHeader("libreadline.h", _HEADER);
+    var e = {};
+    if (isGnu) {
+      e["__GNU__"] = "true";
+    }
+    LibraryManager.loadHeader("libreadline.h", _HEADER, e);
     libreadline.link(["libreadline.h"]);
 
     checkSysCallResult(invoke("readline::rl_initialize"));
@@ -71,4 +85,26 @@ class Readline {
     var r = toNativeString(input);
     checkSysCallResult(invoke("readline::add_history", [r]));
   }
+
+  static void bindKey(key, Function handler) {
+    LibReadline.init();
+
+    var functionType = getBinaryType("rl_command_func_t");
+
+    var callback = new BinaryCallback(functionType, (args) {
+      if (handler is ReadlineCommandRegularFunction) {
+        return handler(args[0], args[1]);
+      } else {
+        return handler();
+      }
+    });
+
+    checkSysCallResult(invoke("readline::rl_bind_key", [key is String ? key.codeUnitAt(0) : key, callback.functionCode]));
+  }
+
+  static void unbindKey(key) {
+    checkSysCallResult(invoke("readline::rl_unbind_key", [key is String ? key.codeUnitAt(0) : key]));
+  }
 }
+
+typedef int ReadlineCommandRegularFunction(int x, int y);

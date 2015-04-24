@@ -4,6 +4,7 @@ import "package:syscall/readline.dart";
 import "dart:isolate";
 
 worker(SendPort port) async {
+  LibReadline.init();
   var receiver = new ReceivePort();
   port.send(receiver.sendPort);
 
@@ -15,22 +16,30 @@ worker(SendPort port) async {
         "type": "read",
         "data": result
       });
+    } else if (msg["method"] == "addLineToHistory") {
+      var line = msg["line"];
+      Readline.addLineToHistory(line);
+    } else if (msg["method"] == "bindKey") {
+      var key = msg["key"];
+      var handler = msg["handler"];
+
+      Readline.bindKey(key, handler);
     }
   }
 }
 
 String prompt = r"$ ";
 
+SendPort mainPort;
+
 main() async {
   var receiver = new ReceivePort();
   var msgs = receiver.asBroadcastStream();
   var isolate = await Isolate.spawn(worker, receiver.sendPort);
-  SendPort port = await msgs.first;
-
-  msgs.listen(handleMessage);
+  mainPort = await msgs.first;
 
   while (true) {
-    port.send({
+    mainPort.send({
       "method": "readline",
       "prompt": prompt
     });
@@ -49,8 +58,13 @@ handleLine(String line) async {
   if (line == null) {
     exit(1);
   }
-  line = line.trim();
-  Readline.addLineToHistory(line);
+  line = line.trimLeft();
+
+  mainPort.send({
+    "method": "addLineToHistory",
+    "line": line
+  });
+
   var split = line.split(" ");
   if (split.length == 0) {
     return;
@@ -66,5 +80,7 @@ handleCommand(String cmd, List<String> args) async {
     exit(0);
   } else if (cmd == "clear-history") {
     Readline.clearHistory();
+  } else if (cmd == "print") {
+    print(args.join(" "));
   }
 }

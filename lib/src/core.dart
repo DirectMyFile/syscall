@@ -273,10 +273,15 @@ class LibraryManager {
     libc.link(["libc.h"]);
   }
 
-  static void loadHeader(String name, String content) {
+  static void loadHeader(String name, String content, [Map<String, dynamic> env]) {
     _ensure();
+    Map<String, dynamic> e = new Map<String, dynamic>.from(_env);
+    if (env != null) {
+      e.addAll(env);
+    }
+
     typeHelper.addHeader(name, content);
-    typeHelper.declare(name, environment: _env);
+    typeHelper.declare(name, environment: e);
   }
 
   static Map<String, dynamic> _env;
