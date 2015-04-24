@@ -47,6 +47,13 @@ main() async {
     prompt = storage["prompt"];
   }
 
+  if (storage["aliases"] != null) {
+    for (var a in storage["aliases"].keys) {
+      addAlias(a, storage["aliases"][a]);
+    }
+    await saveStorage();
+  }
+
   env.addAll(Platform.environment);
   env["BULLET_VERSION"] = "1.0";
 
@@ -183,19 +190,16 @@ Map<String, dynamic> commands = {
     print(args.join(" "));
   },
   "echo": "print",
-  "alias": (List<String> args) {
+  "alias": (List<String> args) async {
     if (args.length <= 1) {
       print("Usage: alias {your command} {target command}");
     }
 
     var m = args[0];
     var l = args.skip(1).toList();
-    commands[m] = (List<String> a) {
-      var t = l[0];
-      var r = l.skip(1).toList();
-      var q = new List<String>.from(r)..addAll(a);
-      return handleCommand(t, q);
-    };
+
+    addAlias(m, l);
+    await saveStorage();
   },
   "set": (List<String> args) {
     if (args.length < 2) {
@@ -213,6 +217,21 @@ Map<String, dynamic> commands = {
     }
   }
 };
+
+void addAlias(String m, List<String> l) {
+  commands[m] = (List<String> a) {
+    var t = l[0];
+    var r = l.skip(1).toList();
+    var q = new List<String>.from(r)..addAll(a);
+    return handleCommand(t, q);
+  };
+
+  if (!storage.containsKey("aliases")) {
+    storage["aliases"] = {};
+  }
+
+  storage["aliases"][m] = l;
+}
 
 loadStorage() async {
   var file = new File("${Platform.environment["HOME"]}/.bullet/storage.json");
