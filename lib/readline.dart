@@ -6,6 +6,8 @@ import "package:binary_interop/binary_interop.dart";
 import "package:syscall/syscall.dart";
 
 const String _HEADER = """
+typedef int rl_command_func_t(int, int);
+
 char *readline(const char* prompt);
 int rl_initialize(void);
 void using_history(void);
@@ -22,7 +24,9 @@ class LibReadline {
   static DynamicLibrary libreadline;
 
   static void init() {
-    if (libreadline != null) return;
+    if (libreadline != null) {
+      return;
+    }
 
     String name;
 
