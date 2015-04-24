@@ -65,8 +65,8 @@ class Snappy {
     if (status != SnappyStatus.OK) {
       throw new SnappyException(status);
     }
-    rs = allocArray("char", maxOutputSize.value, rs.value.take(maxOutputSize.value).toList());
-    print(rs.value);
+    var bytes = rs.value.take(maxOutputSize.value).toList();
+    rs = allocArray("char", maxOutputSize.value, bytes);
     return readNativeString(rs);
   }
 
@@ -80,7 +80,6 @@ class Snappy {
     if (status != SnappyStatus.OK) {
       throw new SnappyException(status);
     }
-    print(rs.value);
     return readNativeString(rs);
   }
 

@@ -11,6 +11,8 @@ System Calls include both pure C functions and actual System Calls, as well as b
 ## Bindings
 
 - OpenCV (WIP)
+- Readline
+- Snappy
 
 ## Examples
 

@@ -103,6 +103,8 @@ class Readline {
   }
 
   static void unbindKey(key) {
+    LibReadline.init();
+
     checkSysCallResult(invoke("readline::rl_unbind_key", [key is String ? key.codeUnitAt(0) : key]));
   }
 }
