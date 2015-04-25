@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:convert";
 import "dart:io";
 
@@ -42,6 +43,7 @@ SendPort mainPort;
 
 main() async {
   await loadStorage();
+  await loadSystemCommands();
 
   if (storage["prompt"] != null) {
     prompt = storage["prompt"];
@@ -141,6 +143,33 @@ handleLine(String line) async {
   var args = split.skip(1).toList();
 
   await handleCommand(cmd, args);
+}
+
+loadSystemCommands() async {
+  var c = {};
+  var paths = Platform.environment["PATH"].split(Platform.isWindows ? ";" : ":");
+  for (var path in paths) {
+    var dir = new Directory(path);
+    if (!(await dir.exists())) {
+      continue;
+    }
+
+    await for (File file in dir.list().where((it) => it is File)) {
+      FileStat stat = await file.stat();
+      if (hasPermission(stat.mode, FilePermission.EXECUTE)) {
+        var z = file.path;
+        var name = z.split(Platform.pathSeparator).last;
+        c[name] = z;
+      }
+    }
+  }
+
+  for (var name in c.keys) {
+    commands[name] = (List<String> args) async {
+      var result = await exec(c[name], args: args, inherit: true);
+      return result.exitCode;
+    };
+  }
 }
 
 handleCommand(String cmd, List<String> args) async {
@@ -256,3 +285,160 @@ JsonEncoder jsonEncoder = new JsonEncoder.withIndent("  ");
 Map<String, dynamic> storage = {};
 
 typedef CommandHandler(List<String> args);
+
+class FilePermission {
+
+  final int index;
+  final String _name;
+
+  const FilePermission._(this.index, this._name);
+
+  static const EXECUTE = const FilePermission._(0, 'EXECUTE');
+  static const WRITE = const FilePermission._(1, 'WRITE');
+  static const READ = const FilePermission._(2, 'READ');
+  static const SET_UID = const FilePermission._(3, 'SET_UID');
+  static const SET_GID = const FilePermission._(4, 'SET_GID');
+  static const STICKY = const FilePermission._(5, 'STICKY');
+
+  static const List<FilePermission> values = const [EXECUTE, WRITE, READ, SET_UID, SET_GID, STICKY];
+
+  String toString() => 'FilePermission.$_name';
+}
+
+class FilePermissionRole {
+
+  final int index;
+  final String _name;
+
+  const FilePermissionRole._(this.index, this._name);
+
+  static const WORLD = const FilePermissionRole._(0, 'WORLD');
+  static const GROUP = const FilePermissionRole._(1, 'GROUP');
+  static const OWNER = const FilePermissionRole._(2, 'OWNER');
+
+  static const List<FilePermissionRole> values = const [WORLD, GROUP, OWNER];
+
+  String toString() => 'FilePermissionRole.$_name';
+}
+
+bool hasPermission(int fileStatMode, FilePermission permission, {FilePermissionRole role: FilePermissionRole.WORLD}) {
+  var bitIndex = _getPermissionBitIndex(permission, role);
+  return (fileStatMode & (1 << bitIndex)) != 0;
+}
+
+int _getPermissionBitIndex(FilePermission permission, FilePermissionRole role) {
+  switch (permission) {
+    case FilePermission.SET_UID:
+      return 11;
+    case FilePermission.SET_GID:
+      return 10;
+    case FilePermission.STICKY:
+      return 9;
+    default:
+      return (role.index * 3) + permission.index;
+  }
+}
+
+typedef void ProcessHandler(Process process);
+typedef void OutputHandler(String str);
+
+Stdin get _stdin => stdin;
+
+class BetterProcessResult extends ProcessResult {
+  final String output;
+
+  BetterProcessResult(int pid, int exitCode, stdout, stderr, this.output) :
+  super(pid, exitCode, stdout, stderr);
+}
+
+Future<BetterProcessResult> exec(
+    String executable,
+    {
+    List<String> args: const [],
+    String workingDirectory,
+    Map<String, String> environment,
+    bool includeParentEnvironment: true,
+    bool runInShell: false,
+    stdin,
+    ProcessHandler handler,
+    OutputHandler stdoutHandler,
+    OutputHandler stderrHandler,
+    OutputHandler outputHandler,
+    bool inherit: false
+    }) async {
+  Process process = await Process.start(
+      executable,
+      args,
+      workingDirectory: workingDirectory,
+      environment: environment,
+      includeParentEnvironment: includeParentEnvironment,
+      runInShell: runInShell
+  );
+
+  var buff = new StringBuffer();
+  var ob = new StringBuffer();
+  var eb = new StringBuffer();
+
+  process.stdout.transform(UTF8.decoder).listen((str) {
+    ob.write(str);
+    buff.write(str);
+
+    if (stdoutHandler != null) {
+      stdoutHandler(str);
+    }
+
+    if (outputHandler != null) {
+      outputHandler(str);
+    }
+
+    if (inherit) {
+      stdout.write(str);
+    }
+  });
+
+  process.stderr.transform(UTF8.decoder).listen((str) {
+    eb.write(str);
+    buff.write(str);
+
+    if (stderrHandler != null) {
+      stderrHandler(str);
+    }
+
+    if (outputHandler != null) {
+      outputHandler(str);
+    }
+
+    if (inherit) {
+      stderr.write(str);
+    }
+  });
+
+  if (handler != null) {
+    handler(process);
+  }
+
+  if (stdin != null) {
+    if (stdin is Stream) {
+      stdin.listen(process.stdin.add, onDone: process.stdin.close);
+    } else if (stdin is List) {
+      process.stdin.add(stdin);
+    } else {
+      process.stdin.write(stdin);
+      await process.stdin.close();
+    }
+  } else if (inherit) {
+    Stream<List<int>> a = await new File("/dev/stdin").openRead();
+    a.listen(process.stdin.add, onDone: process.stdin.close);
+  }
+
+  var code = await process.exitCode;
+  var pid = process.pid;
+
+  return new BetterProcessResult(
+      pid,
+      code,
+      ob.toString(),
+      eb.toString(),
+      buff.toString()
+  );
+}
