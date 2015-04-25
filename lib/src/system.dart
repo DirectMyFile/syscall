@@ -467,8 +467,12 @@ void setSystemTime(int time) {
 }
 
 /// Execute the Given Command
-void executeSystem(String command) {
-  checkSysCallResult(invoke("system", [toNativeString(command)]));
+int executeSystem(String command) {
+  return checkSysCallResult(invoke("system", [toNativeString(command)]));
+}
+
+int getExitCodeFromStatus(int status) {
+  return (status >> 8) & 0x000000ff;
 }
 
 /// Gets the path to the controlling terminal.

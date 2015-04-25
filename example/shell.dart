@@ -3,6 +3,7 @@ import "dart:convert";
 import "dart:io";
 
 import "package:syscall/readline.dart";
+import "package:syscall/syscall.dart" as syscall;
 import "dart:isolate";
 
 worker(SendPort port) async {
@@ -44,6 +45,8 @@ SendPort mainPort;
 main() async {
   await loadStorage();
   await loadSystemCommands();
+
+  commands.addAll(builtInCommands);
 
   if (storage["prompt"] != null) {
     prompt = storage["prompt"];
@@ -166,8 +169,13 @@ loadSystemCommands() async {
 
   for (var name in c.keys) {
     commands[name] = (List<String> args) async {
-      var result = await exec(c[name], args: args, inherit: true);
-      return result.exitCode;
+      if (storage["spawn_using_syscall"] == false) {
+        var result = await exec(c[name], args: args, inherit: true);
+        return result.exitCode;
+      } else {
+        var result = syscall.executeSystem(([name]..addAll(args)).join(" "));
+        return syscall.getExitCodeFromStatus(result);
+      }
     };
   }
 }
@@ -190,7 +198,9 @@ handleCommand(String cmd, List<String> args) async {
   }
 }
 
-Map<String, dynamic> commands = {
+Map<String, dynamic> commands = {};
+
+Map<String, dynamic> builtInCommands = {
   "exit": (List<String> args) {
     int code = 0;
     if (args.length > 1) {
@@ -306,7 +316,6 @@ class FilePermission {
 }
 
 class FilePermissionRole {
-
   final int index;
   final String _name;
 
