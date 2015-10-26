@@ -43,9 +43,7 @@ class LibOpenCV {
 }
 
 VideoCapture openCamera(int id) {
-  print("Open Camera");
   var box = invoke("opencv_highgui::cvCreateCameraCapture", [id]);
-  print("Got Box");
   return new VideoCapture(box);
 }
 
