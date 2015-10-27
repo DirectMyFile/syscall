@@ -10,8 +10,11 @@ import "package:system_info/system_info.dart";
 
 import "darwin.dart" show getSysCtlValue;
 
+export "package:binary_types/binary_types.dart";
+
 part "src/core.dart";
 part "src/system.dart";
 part "src/env.dart";
 part "src/files.dart";
 part "src/utils.dart";
+part "src/socket.dart";

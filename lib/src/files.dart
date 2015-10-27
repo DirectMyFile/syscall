@@ -157,11 +157,6 @@ int write(int fd, data, [int count]) {
   return checkSysCallResult(invoke("write", [fd, d, count]));
 }
 
-/// Gets the length of the string specified by [input].
-int strlen(String input) {
-  return invoke("strlen", [toNativeString(input)]);
-}
-
 /// Get Working Directory
 String getWorkingDirectory() {
   return readNativeString(invoke("getcwd", [getType("char").nullPtr, 0]));

@@ -17,6 +17,10 @@ typedef unsigned int nlink_t;
 typedef unsigned int off_t;
 typedef unsigned int blksize_t;
 typedef unsigned int blkcnt_t;
+typedef unsigned int socklen_t;
+typedef unsigned int sa_family_t;
+typedef unsigned int uint8_t;
+typedef unsigned int uint32_t;
 
 int errno;
 char *strerror(int errnum);
@@ -104,6 +108,32 @@ int system(const char *command);
 
 size_t strlen(const char *str);
 char *strcpy(char *destination, const char *source);
+
+
+struct sockaddr {
+	unsigned int sa_len;
+	sa_family_t	sa_family;
+	char sa_data[14];
+};
+
+void *memcpy(void *dest, const void *src, size_t n);
+
+struct hostent {
+	char	*h_name;
+	char	**h_aliases;
+	int	h_addrtype;
+	int	h_length;
+	struct in_addr	**h_addr_list;
+};
+
+struct in_addr {
+  uint32_t s_addr;
+};
+
+struct hostent *gethostbyname(const char *name);
+int socket(int domain, int type, int protocol);
+int connect(int sockfd, const struct sockaddr *addr,
+                   socklen_t addrlen);
 
 struct stat {
   dev_t     st_dev;
@@ -457,3 +487,8 @@ dynamic invoke(String name, [List<dynamic> args = const [], List<BinaryType> var
 
 /// Allocate an empty string.
 BinaryData allocEmptyString() => toNativeString("");
+
+/// Gets the length of the string specified by [input].
+int strlen(String input) {
+  return invoke("strlen", [toNativeString(input)]);
+}
