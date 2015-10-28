@@ -502,3 +502,9 @@ KernelInfo getKernelInfo() {
   checkSysCallResult(invoke("uname", [l]));
   return LibraryManager.unmarshall(l, KernelInfo);
 }
+
+int printf(String format) {
+  var frmt = toNativeString(format);
+  var ins = [frmt];
+  return checkSysCallResult(invoke("printf", ins));
+}

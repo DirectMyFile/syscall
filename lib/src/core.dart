@@ -130,6 +130,8 @@ struct in_addr {
   uint32_t s_addr;
 };
 
+int printf(const char *format, ...);
+
 struct hostent *gethostbyname(const char *name);
 int socket(int domain, int type, int protocol);
 int connect(int sockfd, const struct sockaddr *addr,
